@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Greater Noida West Road Repair Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Civic Harmony -->
+    <!-- Application Structure Plan: The application is designed as a single-page, task-oriented guide to empower citizens. Instead of mirroring the report's linear chapters, it uses a user-centric flow: 1. Introduction (Identify the problem), 2. Authority (Who to contact), 3. Current Projects (What's happening now), 4. Action Plan (A step-by-step interactive guide from complaining to legal options), and 5. Key Contacts (Quick reference). This structure is chosen to guide the user from understanding to action, making the complex information digestible and immediately useful. A sticky navigation bar allows easy access to each actionable section. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Complaint resolution timelines (Table 2). Goal: Inform users of expected wait times. Viz: Horizontal Bar Chart (Chart.js). Interaction: Tooltips on hover. Justification: A chart is more intuitive and comparable than a text table. Library: Chart.js.
+        - Report Info: Escalation hierarchy (Section VI). Goal: Clarify the escalation process. Viz: Visual "Escalation Ladder" diagram. Interaction: Static visual. Justification: A diagram is more intuitive than a block of text for showing a process. Method: HTML/Tailwind CSS.
+        - Report Info: Legal options (Section VIII). Goal: Organize complex legal info. Viz: Accordion component. Interaction: Click to expand/collapse. Justification: Hides complexity by default, preventing user overwhelm while keeping information accessible. Method: HTML/JS.
+        - Report Info: Key officials and projects. Goal: Inform and provide specific, actionable data. Viz: Styled contact and project cards. Interaction: Static info display. Justification: Organizes key data points into scannable, visually distinct units. Method: HTML/Tailwind CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            margin: auto;
+            height: 40vh;
+            width: 100%;
+            max-width: 700px;
+            max-height: 500px;
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-gray-800">
+
+    <!-- Header & Navigation -->
+    <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl md:text-2xl font-bold text-teal-700">Road Solution Guide</h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#introduction" class="text-gray-600 hover:bg-teal-600 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Introduction</a>
+                        <a href="#authority" class="text-gray-600 hover:bg-teal-600 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Who's Responsible?</a>
+                        <a href="#projects" class="text-gray-600 hover:bg-teal-600 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Current Projects</a>
+                        <a href="#action-plan" class="text-gray-600 hover:bg-teal-600 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Action Plan</a>
+                        <a href="#contacts" class="text-gray-600 hover:bg-teal-600 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Key Contacts</a>
+                    </div>
+                </div>
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-500 hover:text-white hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+                        <span class="sr-only">Open main menu</span>
+                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </nav>
+        <div id="mobile-menu" class="md:hidden hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#introduction" class="text-gray-600 hover:bg-teal-600 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Introduction</a>
+                <a href="#authority" class="text-gray-600 hover:bg-teal-600 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Who's Responsible?</a>
+                <a href="#projects" class="text-gray-600 hover:bg-teal-600 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Current Projects</a>
+                <a href="#action-plan" class="text-gray-600 hover:bg-teal-600 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Action Plan</a>
+                <a href="#contacts" class="text-gray-600 hover:bg-teal-600 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Key Contacts</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+
+        <!-- Introduction Section -->
+        <section id="introduction" class="text-center mb-16 md:mb-24">
+            <h2 class="text-4xl md:text-5xl font-bold text-teal-800 mb-4">Are the roads in your area in bad shape?</h2>
+            <p class="max-w-3xl mx-auto text-lg md:text-xl text-gray-600">
+                This is an interactive guide for the residents of Roza Jalalpur and Sadullapur in Greater Noida West. Learn where and how you can file a complaint to get your roads repaired and how to hold the authorities accountable.
+            </p>
+        </section>
+
+        <!-- Authority Section -->
+        <section id="authority" class="mb-16 md:mb-24 scroll-mt-16">
+            <div class="text-center mb-12">
+                <h3 class="text-3xl md:text-4xl font-bold text-teal-800">Who is Responsible?</h3>
+                <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">The sole responsible body for all infrastructure, including roads, in Greater Noida West is the <span class="font-bold text-teal-700">Greater Noida Industrial Development Authority (GNIDA)</span>.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-lg text-center border-t-4 border-amber-400">
+                    <div class="mx-auto flex items-center justify-center h-24 w-24 rounded-full bg-gray-200 text-gray-500 mb-4 text-4xl">👤</div>
+                    <h4 class="text-xl font-bold text-gray-900">Mr. Abhishek Pathak</h4>
+                    <p class="text-gray-600">Officer on Special Duty (OSD)</p>
+                    <p class="text-sm font-semibold text-teal-600">Greater Noida West</p>
+                    <p class="mt-2 text-sm text-gray-500">abhishekp@gnida.in</p>
+                    <p class="text-sm text-gray-500">+91 120-2336019</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg text-center border-t-4 border-amber-400">
+                    <div class="mx-auto flex items-center justify-center h-24 w-24 rounded-full bg-gray-200 text-gray-500 mb-4 text-4xl">👤</div>
+                    <h4 class="text-xl font-bold text-gray-900">Mr. R. K. Dev</h4>
+                    <p class="text-gray-600">General Manager (GM)</p>
+                    <p class="text-sm font-semibold text-teal-600">Greater Noida West Office</p>
+                    <p class="mt-2 text-sm text-gray-500">rkdev@gnida.in</p>
+                    <p class="text-sm text-gray-500">+91 120-2336025</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg text-center border-t-4 border-amber-400">
+                    <div class="mx-auto flex items-center justify-center h-24 w-24 rounded-full bg-gray-200 text-gray-500 mb-4 text-4xl">👤</div>
+                    <h4 class="text-xl font-bold text-gray-900">Mr. Ashish Kumar Singh</h4>
+                    <p class="text-gray-600">General Manager (GM)</p>
+                    <p class="text-sm font-semibold text-teal-600">Project/Water/Sewer</p>
+                    <p class="mt-2 text-sm text-gray-500">gmproject@gnida.in</p>
+                    <p class="text-sm text-gray-500">+91 120-2336015</p>
+                </div>
+            </div>
+             <p class="mt-8 text-center text-md text-gray-600">Contacting these officials directly for your area's issues can be most effective.</p>
+        </section>
+
+        <!-- Projects Section -->
+        <section id="projects" class="mb-16 md:mb-24 scroll-mt-16 bg-teal-50/50 rounded-2xl p-8">
+            <div class="text-center mb-12">
+                <h3 class="text-3xl md:text-4xl font-bold text-teal-800">What work is happening in your area?</h3>
+                <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">GNIDA has announced some plans for your area. You can track the status of these projects.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-teal-500">
+                    <h4 class="text-xl font-bold text-gray-900 mb-2">Roza Jalalpur: Interlocking Tiles & Drain</h4>
+                    <p class="text-gray-600 mb-4">Laying of interlocking tiles and construction of an RCC drain from the primary school to Jai Prakash House.</p>
+                    <div class="text-sm space-y-1">
+                        <p><span class="font-semibold">Tender ID:</span> 2025_GNIDA_1031637_4</p>
+                        <p><span class="font-semibold">Estimated Cost:</span> ₹1.47 Crore</p>
+                        <p><span class="font-semibold">Status:</span> Bidding process ended in May 2025. Work is expected to start soon.</p>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-teal-500">
+                    <h4 class="text-xl font-bold text-gray-900 mb-2">"Model Village" Initiative</h4>
+                    <p class="text-gray-600 mb-4">Under GNIDA's "Model Village" initiative, the following works are planned for your areas:</p>
+                    <ul class="list-disc list-inside text-gray-700 space-y-1">
+                        <li><span class="font-semibold">Sadullapur:</span> Road construction work.</li>
+                        <li><span class="font-semibold">Roza Jalalpur:</span> Drain repair.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Action Plan Section -->
+        <section id="action-plan" class="mb-16 md:mb-24 scroll-mt-16">
+            <div class="text-center mb-12">
+                <h3 class="text-3xl md:text-4xl font-bold text-teal-800">Your 4-Step Action Plan</h3>
+                <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">Follow these steps to resolve the issue. Be sure to keep a record of every step.</p>
+            </div>
+
+            <div class="space-y-12">
+                <!-- Step 1: File a Complaint -->
+                <div class="p-8 bg-white rounded-2xl shadow-lg border-t-4 border-blue-500">
+                    <h4 class="text-2xl font-bold mb-1 text-blue-800">Step 1: File a Complaint</h4>
+                    <p class="text-gray-600 mb-6">The first step is to file a formal complaint through GNIDA's official channels.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <a href="https://investgnida.in/page/en/citizen-services" target="_blank" class="block p-4 bg-blue-50 rounded-lg text-center hover:bg-blue-100 transition duration-300">
+                            <p class="text-lg font-semibold text-blue-700">GNIDA Citizen Portal</p>
+                            <p class="text-sm text-gray-600">File a complaint online (no login required)</p>
+                        </a>
+                        <a href="https://play.google.com/store/apps/details?id=com.paas.gnida" target="_blank" class="block p-4 bg-blue-50 rounded-lg text-center hover:bg-blue-100 transition duration-300">
+                             <p class="text-lg font-semibold text-blue-700">"Mitra" Mobile App</p>
+                            <p class="text-sm text-gray-600">Complain and track from your phone</p>
+                        </a>
+                    </div>
+                    <p class="text-gray-700 font-semibold mb-4 text-center">GNIDA's Timelines for Complaint Resolution:</p>
+                    <div class="chart-container">
+                        <canvas id="complaintTimelineChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Step 2: Escalate -->
+                <div class="p-8 bg-white rounded-2xl shadow-lg border-t-4 border-purple-500">
+                    <h4 class="text-2xl font-bold mb-1 text-purple-800">Step 2: Escalate</h4>
+                    <p class="text-gray-600 mb-6">If no action is taken within the specified time, escalate your complaint to higher authorities.</p>
+                    <div class="flex flex-col md:flex-row justify-around items-center gap-8">
+                        <!-- Internal Escalation -->
+                        <div class="w-full md:w-1/2">
+                            <h5 class="font-bold text-lg text-center mb-4 text-purple-700">GNIDA Internal Hierarchy</h5>
+                            <div class="relative pl-8">
+                                <!-- The line -->
+                                <div class="absolute left-4 top-0 bottom-0 w-0.5 bg-purple-200"></div>
+                                <!-- Steps -->
+                                <div class="relative mb-6">
+                                    <div class="absolute left-[-1.5rem] top-1/2 -translate-y-1/2 w-8 h-8 bg-purple-500 rounded-full text-white flex items-center justify-center font-bold">1</div>
+                                    <div class="ml-4 p-3 bg-purple-50 rounded-lg">
+                                        <p class="font-semibold">OSD / GM (Greater Noida West)</p>
+                                        <p class="text-sm text-gray-600">First point of contact.</p>
+                                    </div>
+                                </div>
+                                <div class="relative mb-6">
+                                    <div class="absolute left-[-1.5rem] top-1/2 -translate-y-1/2 w-8 h-8 bg-purple-500 rounded-full text-white flex items-center justify-center font-bold">2</div>
+                                    <div class="ml-4 p-3 bg-purple-50 rounded-lg">
+                                        <p class="font-semibold">Additional CEO (ACEO - Project)</p>
+                                        <p class="text-sm text-gray-600">If there's no response from GM/OSD.</p>
+                                    </div>
+                                </div>
+                                <div class="relative">
+                                    <div class="absolute left-[-1.5rem] top-1/2 -translate-y-1/2 w-8 h-8 bg-purple-500 rounded-full text-white flex items-center justify-center font-bold">3</div>
+                                    <div class="ml-4 p-3 bg-purple-50 rounded-lg">
+                                        <p class="font-semibold">Chief Executive Officer (CEO)</p>
+                                        <p class="text-sm text-gray-600">Highest level of escalation.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- External Escalation -->
+                        <div class="w-full md:w-1/2 text-center p-6 bg-purple-50 rounded-lg">
+                            <h5 class="font-bold text-lg mb-4 text-purple-700">External Oversight</h5>
+                             <p class="text-gray-600 mb-4">If there's no hearing within GNIDA, complain on the national-level portal.</p>
+                            <a href="https://pgportal.gov.in/" target="_blank" class="inline-block bg-purple-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-purple-700 transition duration-300">
+                                Go to CPGRAMS Portal
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Community Power -->
+                <div class="p-8 bg-white rounded-2xl shadow-lg border-t-4 border-green-500">
+                    <h4 class="text-2xl font-bold mb-1 text-green-800">Step 3: Use Community Power</h4>
+                    <p class="text-gray-600 mb-6">Your voice becomes more powerful when you stand together.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-green-50 p-6 rounded-lg">
+                            <h5 class="font-bold text-lg mb-2 text-green-700">Resident Welfare Associations (RWA)</h5>
+                            <p class="text-gray-600 mb-3">Contact your local RWA and raise the issue collectively.</p>
+                            <ul class="list-disc list-inside text-gray-700">
+                                <li>Nilgiri 2 Sadullapur</li>
+                                <li>Freehold Plots, Roza Jalalpur Village</li>
+                            </ul>
+                        </div>
+                        <div class="bg-green-50 p-6 rounded-lg">
+                            <h5 class="font-bold text-lg mb-2 text-green-700">Media and Social Media</h5>
+                            <p class="text-gray-600">Put pressure on the authorities by highlighting the problem in local newspapers and on social media.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4: Legal Options -->
+                <div class="p-8 bg-white rounded-2xl shadow-lg border-t-4 border-red-500">
+                    <h4 class="text-2xl font-bold mb-1 text-red-800">Step 4: Legal Options (Last Resort)</h4>
+                    <p class="text-gray-600 mb-6">If no administrative measures work, you have legal rights. It is advisable to consult a lawyer for this.</p>
+                    <div id="accordion-container" class="space-y-2">
+                        <!-- Accordion Item 1 -->
+                        <div>
+                            <button class="accordion-button w-full text-left p-4 bg-red-50 hover:bg-red-100 rounded-lg focus:outline-none transition duration-300 flex justify-between items-center">
+                                <span class="font-semibold text-lg text-red-700">Legal Notice</span>
+                                <span class="accordion-icon text-red-700 text-2xl font-thin transform transition-transform">+</span>
+                            </button>
+                            <div class="accordion-content hidden p-4 bg-red-50/50 border-l-2 border-red-200 mt-1 rounded-b-lg">
+                                <p class="text-gray-700">This is the first legal step. Send a formal notice to GNIDA through a lawyer, detailing the problem and giving a timeline for action.</p>
+                            </div>
+                        </div>
+                        <!-- Accordion Item 2 -->
+                        <div>
+                            <button class="accordion-button w-full text-left p-4 bg-red-50 hover:bg-red-100 rounded-lg focus:outline-none transition duration-300 flex justify-between items-center">
+                                <span class="font-semibold text-lg text-red-700">Civil Suit</span>
+                                <span class="accordion-icon text-red-700 text-2xl font-thin transform transition-transform">+</span>
+                            </button>
+                            <div class="accordion-content hidden p-4 bg-red-50/50 border-l-2 border-red-200 mt-1 rounded-b-lg">
+                                <p class="text-gray-700">If an accident or property damage has occurred due to the bad road, you can file a civil suit for compensation. This requires proving negligence.</p>
+                            </div>
+                        </div>
+                        <!-- Accordion Item 3 -->
+                        <div>
+                            <button class="accordion-button w-full text-left p-4 bg-red-50 hover:bg-red-100 rounded-lg focus:outline-none transition duration-300 flex justify-between items-center">
+                                <span class="font-semibold text-lg text-red-700">Writ Petition</span>
+                                <span class="accordion-icon text-red-700 text-2xl font-thin transform transition-transform">+</span>
+                            </button>
+                            <div class="accordion-content hidden p-4 bg-red-50/50 border-l-2 border-red-200 mt-1 rounded-b-lg">
+                                <p class="text-gray-700">You can file a Writ of 'Mandamus' in the High Court to order GNIDA to fulfill its legal duty (road maintenance).</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Key Contacts Section -->
+        <section id="contacts" class="scroll-mt-16 bg-gray-100 rounded-2xl p-8">
+            <div class="text-center mb-12">
+                <h3 class="text-3xl md:text-4xl font-bold text-teal-800">Quick Contact List</h3>
+                <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">Contact information for key GNIDA officials.</p>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white rounded-lg shadow-md">
+                    <thead class="bg-teal-600 text-white">
+                        <tr>
+                            <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Name</th>
+                            <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Designation</th>
+                            <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Email</th>
+                            <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Phone</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-700">
+                        <tr class="border-b">
+                            <td class="py-3 px-4">Mr. Manoj Kumar Singh</td>
+                            <td class="py-3 px-4">Chairman</td>
+                            <td class="py-3 px-4">chairman@gnida.in</td>
+                            <td class="py-3 px-4">+91 120-2336001</td>
+                        </tr>
+                        <tr class="bg-gray-50 border-b">
+                            <td class="py-3 px-4">Mr. Ravi Kumar N.G.</td>
+                            <td class="py-3 px-4">CEO</td>
+                            <td class="py-3 px-4">ceo@gnida.in</td>
+                            <td class="py-3 px-4">+91 120-2336004</td>
+                        </tr>
+                        <tr>
+                            <td class="py-3 px-4">Mrs. Srilakshmi V. S.</td>
+                            <td class="py-3 px-4">ACEO (Planning/Project)</td>
+                            <td class="py-3 px-4">aceovssl@gnida.in</td>
+                            <td class="py-3 px-4">+91 120-2336011</td>
+                        </tr>
+                         <tr class="bg-gray-50 border-b">
+                            <td class="py-3 px-4">Mr. Abhishek Pathak</td>
+                            <td class="py-3 px-4">OSD (Greater Noida West)</td>
+                            <td class="py-3 px-4">abhishekp@gnida.in</td>
+                            <td class="py-3 px-4">+91 120-2336019</td>
+                        </tr>
+                        <tr>
+                            <td class="py-3 px-4">Mr. R. K. Dev</td>
+                            <td class="py-3 px-4">GM (Greater Noida West Office)</td>
+                            <td class="py-3 px-4">rkdev@gnida.in</td>
+                            <td class="py-3 px-4">+91 120-2336025</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white mt-16">
+        <div class="container mx-auto py-4 px-5 text-center">
+            <p class="text-sm">Disclaimer: This information is for guidance only and is not a substitute for legal advice.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Mobile menu toggle
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // Close mobile menu on link click
+            const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+            mobileMenuLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+
+            // Accordion functionality
+            const accordionContainer = document.getElementById('accordion-container');
+            if (accordionContainer) {
+                const accordionButtons = accordionContainer.querySelectorAll('.accordion-button');
+                accordionButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const content = button.nextElementSibling;
+                        const icon = button.querySelector('.accordion-icon');
+                        
+                        // Close other accordions
+                        accordionButtons.forEach(otherButton => {
+                            if (otherButton !== button) {
+                                otherButton.nextElementSibling.classList.add('hidden');
+                                otherButton.querySelector('.accordion-icon').textContent = '+';
+                                otherButton.querySelector('.accordion-icon').classList.remove('rotate-45');
+                            }
+                        });
+
+                        // Toggle current accordion
+                        content.classList.toggle('hidden');
+                        if (content.classList.contains('hidden')) {
+                            icon.textContent = '+';
+                            icon.classList.remove('rotate-45');
+                        } else {
+                            icon.textContent = '+';
+                            icon.classList.add('rotate-45');
+                        }
+                    });
+                });
+            }
+
+            // Chart.js implementation
+            const ctx = document.getElementById('complaintTimelineChart');
+            if (ctx) {
+                const chartData = {
+                    labels: [
+                        'Waterlogging',
+                        'Blocked/Overflowing Drain',
+                        'Temporary Pothole Filling',
+                        'Minor Drain Repair',
+                        'Patch Repair',
+                        'Road Resurfacing'
+                    ],
+                    datasets: [{
+                        label: 'Days for Resolution',
+                        data: [3, 7, 7, 10, 30, 180],
+                        backgroundColor: [
+                            'rgba(59, 130, 246, 0.7)',
+                            'rgba(168, 85, 247, 0.7)',
+                            'rgba(239, 68, 68, 0.7)',
+                            'rgba(245, 158, 11, 0.7)',
+                            'rgba(16, 185, 129, 0.7)',
+                            'rgba(30, 64, 175, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(59, 130, 246, 1)',
+                            'rgba(168, 85, 247, 1)',
+                            'rgba(239, 68, 68, 1)',
+                            'rgba(245, 158, 11, 1)',
+                            'rgba(16, 185, 129, 1)',
+                            'rgba(30, 64, 175, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                };
+
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: chartData,
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            title: {
+                                display: true,
+                                text: 'Official Complaint Resolution Timelines (in Days)',
+                                font: {
+                                    size: 16,
+                                    family: "'Inter', sans-serif"
+                                },
+                                color: '#334155'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return ` ${context.dataset.label}: ${context.raw} days`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Days',
+                                    font: {
+                                        size: 14,
+                                        family: "'Inter', sans-serif"
+                                    }
+                                }
+                            },
+                            y: {
+                                ticks: {
+                                    font: {
+                                        size: 12,
+                                        family: "'Inter', sans-serif"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>

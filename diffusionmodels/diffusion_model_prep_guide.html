@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Course: Learning Diffusion Models</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony -->
+    <!-- Application Structure Plan: A single-page application with a fixed sidebar navigation for a course-like feel. The structure is thematic, not linear, allowing users to explore modules on core concepts, a training simulator, a sampling comparison, a voice cloning demo, and a hardware builder. This non-linear, interactive structure is chosen to make abstract concepts tangible and engaging, promoting learning by doing over passive reading. User flow is guided by the sidebar, which acts as a course syllabus. -->
+    <!-- Visualization & Content Choices: 
+        - Forward/Reverse Process: Goal: Visualize change. Method: Canvas animation of noising/denoising. Interaction: Slider. Justification: Makes the abstract core process visible. Library: Vanilla JS Canvas.
+        - U-Net Architecture: Goal: Organize/Explain. Method: HTML/CSS diagram. Interaction: Hover for info. Justification: Simplifies a complex architecture into understandable parts. Library: None.
+        - Training Loss: Goal: Visualize change over time. Method: Line chart. Interaction: Button to trigger animation. Justification: Simulates the training feedback loop. Library: Chart.js.
+        - Sampler Comparison: Goal: Compare outputs. Method: Side-by-side display. Interaction: Buttons to switch samplers. Justification: Clearly demonstrates the trade-offs (diversity vs. reproducibility). Library: JS DOM.
+        - PC Builder: Goal: Compare/Inform. Method: Dynamic bar chart and text. Interaction: Buttons to select budget tier. Justification: Translates a table of specs into an interactive decision-making tool. Library: Chart.js.
+        - All text is synthesized from the report to be concise and contextual for each interactive module.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F5F5F4; /* Stone 100 */
+            color: #1F2937; /* Gray 800 */
+        }
+        .nav-link {
+            transition: all 0.2s ease-in-out;
+        }
+        .nav-link.active {
+            background-color: #4338CA; /* Indigo 700 */
+            color: #FFFFFF;
+            font-weight: 600;
+        }
+        .nav-link:not(.active):hover {
+            background-color: #E0E7FF; /* Indigo 100 */
+            color: #3730A3; /* Indigo 800 */
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 50vh;
+        }
+        .btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-primary {
+            background-color: #4F46E5; /* Indigo 600 */
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #4338CA; /* Indigo 700 */
+        }
+        .btn-secondary {
+            background-color: #E5E7EB; /* Gray 200 */
+            color: #374151; /* Gray 700 */
+        }
+        .btn-secondary:hover {
+            background-color: #D1D5DB; /* Gray 300 */
+        }
+        .btn.active {
+            background-color: #4338CA;
+            color: white;
+            box-shadow: 0 0 0 2px #A5B4FC;
+        }
+        .canvas-step {
+            border: 1px solid #E5E7EB;
+            border-radius: 0.5rem;
+            background-color: #FAFAF9; /* Stone 50 */
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="flex h-screen bg-stone-100">
+        <!-- Sidebar Navigation -->
+        <aside class="w-64 bg-white shadow-md flex-shrink-0">
+            <div class="p-6">
+                <h1 class="text-2xl font-bold text-indigo-600">Diffusion Course</h1>
+                <p class="text-sm text-gray-500 mt-1">Learn by Doing</p>
+            </div>
+            <nav id="sidebar-nav" class="mt-4 flex flex-col space-y-2 px-4">
+                <a href="#introduction" class="nav-link p-3 rounded-lg flex items-center space-x-3">
+                    <span>👋</span>
+                    <span>Introduction</span>
+                </a>
+                <a href="#core-concepts" class="nav-link p-3 rounded-lg flex items-center space-x-3">
+                    <span>🔬</span>
+                    <span>Core Concepts</span>
+                </a>
+                <a href="#the-engine" class="nav-link p-3 rounded-lg flex items-center space-x-3">
+                    <span>⚙️</span>
+                    <span>The U-Net Engine</span>
+                </a>
+                <a href="#training-lab" class="nav-link p-3 rounded-lg flex items-center space-x-3">
+                    <span>🧪</span>
+                    <span>Training Lab</span>
+                </a>
+                <a href="#sampling-showdown" class="nav-link p-3 rounded-lg flex items-center space-x-3">
+                    <span>🎨</span>
+                    <span>Sampling Showdown</span>
+                </a>
+                <a href="#guided-generation" class="nav-link p-3 rounded-lg flex items-center space-x-3">
+                    <span>🎯</span>
+                    <span>Guided Generation</span>
+                </a>
+                <a href="#voice-cloning" class="nav-link p-3 rounded-lg flex items-center space-x-3">
+                    <span>🔊</span>
+                    <span>Voice Cloning Demo</span>
+                </a>
+                <a href="#build-your-rig" class="nav-link p-3 rounded-lg flex items-center space-x-3">
+                    <span>💻</span>
+                    <span>Build Your Rig</span>
+                </a>
+                <a href="#conclusion" class="nav-link p-3 rounded-lg flex items-center space-x-3">
+                    <span>📜</span>
+                    <span>Conclusion & Ethics</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto">
+            <div class="p-6 md:p-10 space-y-10">
+
+                <!-- Introduction Section -->
+                <section id="introduction" class="content-section">
+                    <h2 class="text-4xl font-bold mb-4">Welcome to the Interactive Diffusion Model Course!</h2>
+                    <p class="text-lg text-gray-600 max-w-3xl leading-relaxed">
+                        This application transforms a detailed report on diffusion models into a hands-on learning experience. Instead of just reading, you'll interact with the core concepts. You'll see how noise is added and removed, explore the U-Net architecture that powers these models, simulate a training process, and compare different ways to generate images. Use the navigation on the left to jump between modules and learn by doing.
+                    </p>
+                </section>
+
+                <!-- Core Concepts Section -->
+                <section id="core-concepts" class="content-section">
+                    <h2 class="text-3xl font-bold mb-2">Core Concepts: The Diffusion Dance</h2>
+                    <p class="text-gray-600 max-w-3xl mb-6">
+                        Diffusion models work in two phases. First, the **Forward Process** gradually adds random noise to a clean image until it becomes unrecognizable. Then, the **Reverse Process** learns to undo this, step-by-step, to create a new, clean image from pure noise. Move the slider below to see this process in action on a simple digit.
+                    </p>
+                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                            <div>
+                                <h3 class="font-semibold text-lg mb-2">Forward Process (Noising)</h3>
+                                <canvas id="forward-canvas" width="200" height="200" class="mx-auto canvas-step"></canvas>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-lg mb-2">Reverse Process (Denoising)</h3>
+                                <canvas id="reverse-canvas" width="200" height="200" class="mx-auto canvas-step"></canvas>
+                            </div>
+                        </div>
+                        <div class="mt-6">
+                            <label for="diffusion-slider" class="block text-center font-medium mb-2">Diffusion Timestep: <span id="slider-value">0</span> / 100</label>
+                            <input id="diffusion-slider" type="range" min="0" max="100" value="0" class="w-full">
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- The Engine Section -->
+                <section id="the-engine" class="content-section">
+                    <h2 class="text-3xl font-bold mb-2">The Engine: U-Net Architecture</h2>
+                    <p class="text-gray-600 max-w-3xl mb-6">
+                        The "brain" of most diffusion models is a special neural network called a **U-Net**. Its U-shape is perfect for denoising. The left side (**Encoder**) compresses the noisy image to understand its content. The right side (**Decoder**) reconstructs the image at a higher resolution. Crucially, **Skip Connections** bridge the two sides, ensuring fine details aren't lost. Hover over the blocks to learn more.
+                    </p>
+                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <div class="flex justify-center items-start space-x-4">
+                            <!-- Encoder Path -->
+                            <div class="flex flex-col space-y-4 items-center">
+                                <div class="p-4 text-center font-semibold">Input</div>
+                                <div class="w-4 h-4 bg-gray-400 rounded-full"></div>
+                                <div class="unet-block" data-info="The Encoder path progressively reduces the image size (downsampling) while extracting higher-level features to understand the 'what' of the image.">
+                                    Encoder Block 1
+                                </div>
+                                <div class="w-4 h-4 bg-gray-400 rounded-full"></div>
+                                <div class="unet-block" data-info="Each block in the encoder typically consists of convolutional layers that analyze the image features.">
+                                    Encoder Block 2
+                                </div>
+                            </div>
+                            <!-- Bottleneck -->
+                            <div class="flex flex-col items-center pt-32">
+                                <div class="unet-block" data-info="The Bottleneck is the lowest-resolution part of the network, where the model has the most compressed, high-level understanding of the image content.">
+                                    Bottleneck
+                                </div>
+                            </div>
+                            <!-- Decoder Path -->
+                            <div class="flex flex-col space-y-4 items-center">
+                                <div class="unet-block" data-info="The Decoder path progressively increases the image size (upsampling) to reconstruct a detailed, clean image.">
+                                    Decoder Block 2
+                                </div>
+                                <div class="w-4 h-4 bg-gray-400 rounded-full"></div>
+                                <div class="unet-block" data-info="Each decoder block combines upsampled information with high-resolution details from the corresponding encoder block via skip connections.">
+                                    Decoder Block 1
+                                </div>
+                                <div class="w-4 h-4 bg-gray-400 rounded-full"></div>
+                                <div class="p-4 text-center font-semibold">Output</div>
+                            </div>
+                        </div>
+                        <!-- Skip Connections (simplified representation) -->
+                        <div class="relative h-1 w-full mt-[-150px] mb-[150px] hidden md:block">
+                            <div class="absolute top-0 left-[28%] w-[44%] h-px bg-indigo-400 border-t border-dashed"></div>
+                            <div class="absolute top-[-65px] left-[32%] w-[36%] h-px bg-indigo-400 border-t border-dashed"></div>
+                            <p class="absolute top-[-25px] left-1/2 -translate-x-1/2 bg-white px-2 text-indigo-600 font-semibold" data-info="Skip Connections are the magic ingredient. They feed detailed information directly from the encoder to the decoder, preventing it from getting lost during compression. This is key for generating sharp, high-fidelity images.">Skip Connections</p>
+                        </div>
+                        <div id="unet-info-box" class="mt-6 p-4 bg-indigo-50 text-indigo-800 rounded-lg min-h-[50px] text-center">
+                            Hover over a component to see its description.
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Training Lab Section -->
+                <section id="training-lab" class="content-section">
+                    <h2 class="text-3xl font-bold mb-2">Training Lab Simulator</h2>
+                    <p class="text-gray-600 max-w-3xl mb-6">
+                        Training a diffusion model involves showing it millions of noisy images and teaching it to predict the original noise. The model's performance is measured by a **loss function** (lower is better). This simulation visualizes the process. Click "Start Training" to see the loss decrease and the quality of generated samples improve over simulated epochs.
+                    </p>
+                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <h3 class="font-semibold text-lg mb-2">Training Loss Over Time</h3>
+                                <div class="chart-container">
+                                    <canvas id="lossChart"></canvas>
+                                </div>
+                                <div class="text-center mt-4">
+                                    <button id="start-training-btn" class="btn btn-primary px-6 py-2 rounded-lg font-semibold">Start Training</button>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-lg mb-2">Generated Samples</h3>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <p class="text-sm font-medium text-center mb-1">Epoch 1</p>
+                                        <canvas id="sample-epoch-1" class="w-full aspect-square canvas-step"></canvas>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-center mb-1">Epoch 25</p>
+                                        <canvas id="sample-epoch-25" class="w-full aspect-square canvas-step"></canvas>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-center mb-1">Epoch 50</p>
+                                        <canvas id="sample-epoch-50" class="w-full aspect-square canvas-step"></canvas>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-center mb-1">Epoch 100</p>
+                                        <canvas id="sample-epoch-100" class="w-full aspect-square canvas-step"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Sampling Showdown Section -->
+                <section id="sampling-showdown" class="content-section">
+                    <h2 class="text-3xl font-bold mb-2">Sampling Showdown: DDPM vs. DDIM</h2>
+                    <p class="text-gray-600 max-w-3xl mb-6">
+                        Once a model is trained, we use a **sampler** to generate new images. Different samplers have different characteristics. Select a sampler below to see the trade-offs.
+                    </p>
+                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <div class="flex justify-center space-x-4 mb-6">
+                            <button class="sampler-btn btn btn-secondary px-4 py-2 rounded-lg" data-sampler="ddpm">DDPM (Stochastic)</button>
+                            <button class="sampler-btn btn btn-secondary px-4 py-2 rounded-lg" data-sampler="ddim">DDIM (Deterministic)</button>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="text-center">
+                                <h3 id="sampler-name" class="font-semibold text-lg mb-2">Select a Sampler</h3>
+                                <p id="sampler-desc" class="text-gray-600 mb-4 min-h-[60px]">Descriptions will appear here.</p>
+                                <canvas id="sampler-canvas" class="w-64 h-64 mx-auto canvas-step"></canvas>
+                                <button id="regenerate-btn" class="mt-4 btn btn-primary px-6 py-2 rounded-lg font-semibold">Regenerate</button>
+                            </div>
+                            <div class="bg-stone-50 p-4 rounded-lg">
+                                <h4 class="font-semibold mb-2">Key Takeaways:</h4>
+                                <ul class="space-y-3 text-gray-700">
+                                    <li class="flex items-start">
+                                        <span class="text-indigo-500 mr-2 mt-1">●</span>
+                                        <span><b>DDPM:</b> Slower (many steps) but produces diverse, unique results each time. Great for creative exploration.</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="text-indigo-500 mr-2 mt-1">●</span>
+                                        <span><b>DDIM:</b> Much faster (fewer steps) and produces the same image every time from the same starting noise. Excellent for reproducibility and speed.</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Guided Generation Section -->
+                <section id="guided-generation" class="content-section">
+                    <h2 class="text-3xl font-bold mb-2">Guided Generation Playground</h2>
+                    <p class="text-gray-600 max-w-3xl mb-6">
+                        The real power of diffusion models is unlocked when we can guide them. By providing a text prompt, we can control the output. This is often done by combining the diffusion model with a language model like CLIP. Try giving the model a simple instruction below.
+                    </p>
+                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <div class="max-w-xl mx-auto">
+                            <div class="flex space-x-2">
+                                <input type="text" id="prompt-input" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g., a photo of a cat">
+                                <button id="generate-prompt-btn" class="btn btn-primary px-6 py-2 rounded-lg font-semibold">Generate</button>
+                            </div>
+                            <div id="guided-output" class="mt-6 w-full aspect-square bg-gray-100 rounded-lg flex items-center justify-center text-gray-500 canvas-step">
+                                Your generated image will appear here.
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Voice Cloning Section -->
+                <section id="voice-cloning" class="content-section">
+                    <h2 class="text-3xl font-bold mb-2">Voice Cloning Demo</h2>
+                    <p class="text-gray-600 max-w-3xl mb-6">
+                        Diffusion models aren't just for images; they excel at audio generation too. Voice cloning systems like Tortoise TTS use diffusion to create realistic speech from just a few seconds of a reference voice. This demo simulates the process.
+                    </p>
+                    <div class="bg-white p-6 rounded-lg shadow-sm max-w-2xl mx-auto">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="font-medium">1. Provide a voice sample (simulated)</label>
+                                <button class="w-full mt-1 btn btn-secondary py-3 rounded-lg flex items-center justify-center space-x-2">
+                                    <span>🎤</span>
+                                    <span>Press and Hold to Record (Demo)</span>
+                                </button>
+                            </div>
+                            <div>
+                                <label for="tts-text" class="font-medium">2. Enter text for the AI to speak</label>
+                                <textarea id="tts-text" rows="3" class="w-full mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Hello, this is a test of voice cloning.">Hello, this is a test of voice cloning.</textarea>
+                            </div>
+                            <div>
+                                <button id="clone-voice-btn" class="w-full btn btn-primary py-3 rounded-lg font-semibold">Generate Cloned Voice</button>
+                            </div>
+                            <div id="audio-output" class="pt-4">
+                                <!-- Audio player will be inserted here -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Build Your Rig Section -->
+                <section id="build-your-rig" class="content-section">
+                    <h2 class="text-3xl font-bold mb-2">Build Your Rig: Home Lab Hardware</h2>
+                    <p class="text-gray-600 max-w-3xl mb-6">
+                        Working with diffusion models requires a powerful computer, especially a good GPU with plenty of VRAM. This interactive guide helps you plan a home lab build based on your budget and needs. Select a tier to see recommended components and how VRAM scales.
+                    </p>
+                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <div class="flex justify-center space-x-2 md:space-x-4 mb-6">
+                            <button class="rig-btn btn btn-secondary px-4 py-2 rounded-lg" data-rig="appetizer">Starter (Learning)</button>
+                            <button class="rig-btn btn btn-secondary px-4 py-2 rounded-lg" data-rig="main">Upgraded (Pro)</button>
+                            <button class="rig-btn btn btn-secondary px-4 py-2 rounded-lg" data-rig="dessert">Advanced (Pro+)</button>
+                        </div>
+                        <div class="grid md:grid-cols-5 gap-6">
+                            <div class="md:col-span-2">
+                                <h3 id="rig-name" class="font-semibold text-xl mb-4">Select a Build Tier</h3>
+                                <div id="rig-components" class="space-y-3"></div>
+                            </div>
+                            <div class="md:col-span-3">
+                                <h3 class="font-semibold text-xl mb-4">VRAM & Cost Comparison (Illustrative)</h3>
+                                <div class="chart-container">
+                                    <canvas id="rigChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Conclusion Section -->
+                <section id="conclusion" class="content-section">
+                    <h2 class="text-3xl font-bold mb-2">Conclusion & Ethical Considerations</h2>
+                    <div class="space-y-6 max-w-3xl">
+                        <p class="text-gray-600 leading-relaxed">
+                            You've now journeyed through the core concepts, training, and application of diffusion models. From their mathematical roots in thermodynamics to practical voice cloning, these models represent a significant leap in generative AI, prized for their stability and high-quality outputs. The field is rapidly advancing towards greater speed, efficiency, and expansion into new areas like video generation.
+                        </p>
+                        <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg">
+                            <h3 class="font-semibold text-red-800">A Note on Ethics</h3>
+                            <p class="text-red-700 mt-2">
+                                The power to generate realistic images and voices comes with serious responsibility. Issues like **deepfakes**, misinformation, copyright infringement, and algorithmic bias are critical challenges. As developers and users, we must champion responsible innovation, advocate for safeguards, and ensure these powerful tools are used to benefit society.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('.content-section');
+
+            function setActiveSection(hash) {
+                const targetHash = hash || window.location.hash || '#introduction';
+                
+                navLinks.forEach(link => {
+                    link.classList.toggle('active', link.hash === targetHash);
+                });
+
+                sections.forEach(section => {
+                    section.classList.toggle('active', `#${section.id}` === targetHash);
+                });
+
+                // Trigger animations/initializations for the active section
+                if (targetHash === '#core-concepts') initCoreConcepts();
+                if (targetHash === '#the-engine') initTheEngine();
+                if (targetHash === '#training-lab') initTrainingLab();
+                if (targetHash === '#sampling-showdown') initSamplingShowdown();
+                if (targetHash === '#guided-generation') initGuidedGeneration();
+                if (targetHash === '#voice-cloning') initVoiceCloning();
+                if (targetHash === '#build-your-rig') initBuildYourRig();
+            }
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetHash = e.currentTarget.hash;
+                    window.history.pushState(null, null, targetHash);
+                    setActiveSection(targetHash);
+                });
+            });
+
+            window.addEventListener('popstate', () => {
+                setActiveSection(window.location.hash);
+            });
+
+            setActiveSection(); // Initial load
+
+            // --- Module Initializers ---
+
+            function initCoreConcepts() {
+                const slider = document.getElementById('diffusion-slider');
+                const sliderValue = document.getElementById('slider-value');
+                const forwardCanvas = document.getElementById('forward-canvas');
+                const reverseCanvas = document.getElementById('reverse-canvas');
+                const fwdCtx = forwardCanvas.getContext('2d');
+                const revCtx = reverseCanvas.getContext('2d');
+                const digitData = createImageData(200, 200);
+
+                function drawDigit(ctx, data) {
+                    ctx.clearRect(0, 0, 200, 200);
+                    ctx.putImageData(data, 0, 0);
+                }
+
+                function addNoise(originalData, level) {
+                    const noisyData = new ImageData(new Uint8ClampedArray(originalData.data), originalData.width, originalData.height);
+                    for (let i = 0; i < noisyData.data.length; i += 4) {
+                        if (originalData.data[i+3] > 0) { // only affect the digit
+                            const noise = (Math.random() - 0.5) * 2 * 255 * (level / 100);
+                            noisyData.data[i] = Math.max(0, Math.min(255, noisyData.data[i] + noise));
+                            noisyData.data[i+1] = Math.max(0, Math.min(255, noisyData.data[i+1] + noise));
+                            noisyData.data[i+2] = Math.max(0, Math.min(255, noisyData.data[i+2] + noise));
+                        }
+                    }
+                    return noisyData;
+                }
+
+                function createImageData(width, height) {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.fillStyle = '#1F2937';
+                    ctx.font = 'bold 150px Inter';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('8', width / 2, height / 2);
+                    return ctx.getImageData(0, 0, width, height);
+                }
+
+                function updateVisuals() {
+                    const level = parseInt(slider.value);
+                    sliderValue.textContent = level;
+
+                    const forwardNoiseLevel = level;
+                    const reverseNoiseLevel = 100 - level;
+
+                    const noisyForward = addNoise(digitData, forwardNoiseLevel);
+                    drawDigit(fwdCtx, noisyForward);
+
+                    const noisyReverse = addNoise(digitData, reverseNoiseLevel);
+                    drawDigit(revCtx, noisyReverse);
+                }
+
+                slider.addEventListener('input', updateVisuals);
+                updateVisuals();
+            }
+            
+            function initTheEngine() {
+                const blocks = document.querySelectorAll('.unet-block, [data-info]');
+                const infoBox = document.getElementById('unet-info-box');
+                
+                blocks.forEach(block => {
+                    block.style.border = '2px solid #E5E7EB';
+                    block.style.padding = '1rem';
+                    block.style.borderRadius = '0.5rem';
+                    block.style.backgroundColor = 'white';
+                    block.style.cursor = 'pointer';
+
+                    block.addEventListener('mouseenter', () => {
+                        infoBox.textContent = block.dataset.info;
+                        block.style.borderColor = '#4F46E5';
+                        block.style.backgroundColor = '#EEF2FF';
+                    });
+                    block.addEventListener('mouseleave', () => {
+                        infoBox.textContent = 'Hover over a component to see its description.';
+                        block.style.borderColor = '#E5E7EB';
+                        block.style.backgroundColor = 'white';
+                    });
+                });
+            }
+
+            let lossChartInstance = null;
+            function initTrainingLab() {
+                const startBtn = document.getElementById('start-training-btn');
+                const sampleCanvases = {
+                    1: document.getElementById('sample-epoch-1').getContext('2d'),
+                    25: document.getElementById('sample-epoch-25').getContext('2d'),
+                    50: document.getElementById('sample-epoch-50').getContext('2d'),
+                    100: document.getElementById('sample-epoch-100').getContext('2d'),
+                };
+
+                function drawSample(ctx, quality) { // quality 0 to 1
+                    const size = ctx.canvas.width;
+                    ctx.clearRect(0, 0, size, size);
+                    ctx.fillStyle = '#FAFAF9';
+                    ctx.fillRect(0, 0, size, size);
+                    const numPoints = 1000 * (1 - quality);
+                    ctx.fillStyle = `rgba(31, 41, 55, ${0.1 + quality * 0.9})`;
+                    
+                    if (quality < 0.2) { // mostly noise
+                        for(let i=0; i<numPoints; i++) {
+                            ctx.beginPath();
+                            ctx.arc(Math.random()*size, Math.random()*size, Math.random()*2, 0, Math.PI*2);
+                            ctx.fill();
+                        }
+                    } else { // becoming a digit
+                        ctx.font = `bold ${size*0.75}px Inter`;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        
+                        const blur = (1 - quality) * 20;
+                        ctx.filter = `blur(${blur}px)`;
+                        ctx.globalAlpha = 0.2 + quality * 0.8;
+                        ctx.fillText('8', size/2, size/2);
+                        ctx.filter = 'none';
+                        ctx.globalAlpha = 1.0;
+                    }
+                }
+                
+                function resetSamples() {
+                    Object.values(sampleCanvases).forEach(ctx => {
+                        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                        ctx.fillStyle = '#E5E7EB';
+                        ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                    });
+                }
+                resetSamples();
+
+                startBtn.addEventListener('click', () => {
+                    startBtn.disabled = true;
+                    startBtn.textContent = 'Training...';
+                    resetSamples();
+
+                    const lossCtx = document.getElementById('lossChart').getContext('2d');
+                    if (lossChartInstance) {
+                        lossChartInstance.destroy();
+                    }
+                    
+                    const totalEpochs = 100;
+                    const labels = Array.from({ length: totalEpochs + 1 }, (_, i) => i);
+                    const lossData = labels.map(i => 2.5 * Math.exp(-i / 20) + 0.1 + Math.random() * 0.2);
+
+                    let currentEpoch = 0;
+                    lossChartInstance = new Chart(lossCtx, {
+                        type: 'line',
+                        data: {
+                            labels: [],
+                            datasets: [{
+                                label: 'Training Loss',
+                                data: [],
+                                borderColor: '#4F46E5',
+                                backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                                fill: true,
+                                tension: 0.4,
+                                pointRadius: 0
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: { beginAtZero: true, title: { display: true, text: 'Loss' } },
+                                x: { title: { display: true, text: 'Epoch' } }
+                            }
+                        }
+                    });
+
+                    const interval = setInterval(() => {
+                        if (currentEpoch <= totalEpochs) {
+                            lossChartInstance.data.labels.push(labels[currentEpoch]);
+                            lossChartInstance.data.datasets[0].data.push(lossData[currentEpoch]);
+                            lossChartInstance.update('none');
+                            
+                            if ([1, 25, 50, 100].includes(currentEpoch)) {
+                                drawSample(sampleCanvases[currentEpoch], currentEpoch / totalEpochs);
+                            }
+                            currentEpoch++;
+                        } else {
+                            clearInterval(interval);
+                            startBtn.disabled = false;
+                            startBtn.textContent = 'Start Training';
+                        }
+                    }, 50);
+                });
+            }
+
+            function initSamplingShowdown() {
+                const samplerBtns = document.querySelectorAll('.sampler-btn');
+                const nameEl = document.getElementById('sampler-name');
+                const descEl = document.getElementById('sampler-desc');
+                const canvas = document.getElementById('sampler-canvas');
+                const ctx = canvas.getContext('2d');
+                const regenerateBtn = document.getElementById('regenerate-btn');
+                let activeSampler = null;
+
+                const samplerData = {
+                    ddpm: {
+                        name: 'DDPM (Stochastic)',
+                        desc: 'Slower, but generates a unique, diverse image each time. The added randomness at each step means no two outputs are identical, even from the same starting point.',
+                        isStochastic: true
+                    },
+                    ddim: {
+                        name: 'DDIM (Deterministic)',
+                        desc: 'Faster and reproducible. It will generate the exact same image every time from the same initial noise, making it great for consistent results.',
+                        isStochastic: false
+                    }
+                };
+                
+                function drawSample(isStochastic) {
+                    const size = canvas.width;
+                    ctx.clearRect(0, 0, size, size);
+                    ctx.fillStyle = '#FAFAF9';
+                    ctx.fillRect(0, 0, size, size);
+                    ctx.fillStyle = '#1F2937';
+                    ctx.font = `bold ${size*0.75}px Inter`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    
+                    const randomOffset = isStochastic ? (Math.random() - 0.5) * 20 : 0;
+                    
+                    ctx.save();
+                    ctx.translate(size/2, size/2);
+                    ctx.rotate(randomOffset * Math.PI / 180);
+                    ctx.fillText('8', 0, 0);
+                    ctx.restore();
+                }
+
+                function selectSampler(sampler) {
+                    activeSampler = sampler;
+                    samplerBtns.forEach(btn => btn.classList.toggle('active', btn.dataset.sampler === sampler));
+                    
+                    const data = samplerData[sampler];
+                    nameEl.textContent = data.name;
+                    descEl.textContent = data.desc;
+                    regenerateBtn.style.display = data.isStochastic ? 'inline-block' : 'none';
+                    drawSample(data.isStochastic);
+                }
+
+                samplerBtns.forEach(btn => {
+                    btn.addEventListener('click', () => selectSampler(btn.dataset.sampler));
+                });
+                
+                regenerateBtn.addEventListener('click', () => {
+                    if (activeSampler) {
+                        drawSample(samplerData[activeSampler].isStochastic);
+                    }
+                });
+
+                selectSampler('ddpm'); // Default selection
+            }
+
+            function initGuidedGeneration() {
+                const input = document.getElementById('prompt-input');
+                const btn = document.getElementById('generate-prompt-btn');
+                const output = document.getElementById('guided-output');
+
+                const drawOutput = (prompt) => {
+                    output.innerHTML = '';
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 512;
+                    canvas.height = 512;
+                    output.appendChild(canvas);
+                    const ctx = canvas.getContext('2d');
+                    ctx.fillStyle = '#e0e7ff';
+                    ctx.fillRect(0, 0, 512, 512);
+                    ctx.fillStyle = '#4f46e5';
+                    ctx.font = '50px Inter';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+
+                    let object = "object";
+                    if (prompt.includes("cat")) object = "🐱";
+                    else if (prompt.includes("dog")) object = "🐶";
+                    else if (prompt.includes("tree")) object = "🌳";
+                    else if (prompt.includes("car")) object = "🚗";
+                    else if (prompt.includes("house")) object = "🏠";
+                    else if (prompt.includes("star")) object = "⭐";
+                    
+                    ctx.font = '200px Inter';
+                    ctx.fillText(object, 256, 256);
+
+                    ctx.font = '30px Inter';
+                    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+                    ctx.fillText(`A representation of: "${prompt}"`, 256, 480);
+                };
+
+                btn.addEventListener('click', () => {
+                    const promptText = input.value.trim();
+                    if (promptText) {
+                        output.textContent = 'Generating...';
+                        setTimeout(() => drawOutput(promptText), 500);
+                    }
+                });
+            }
+
+            function initVoiceCloning() {
+                const btn = document.getElementById('clone-voice-btn');
+                const outputDiv = document.getElementById('audio-output');
+                let audio = null;
+
+                btn.addEventListener('click', () => {
+                    btn.disabled = true;
+                    btn.textContent = 'Generating...';
+                    outputDiv.innerHTML = '<p class="text-center text-gray-500">Synthesizing audio...</p>';
+
+                    setTimeout(() => {
+                        if (audio) {
+                            audio.pause();
+                            audio = null;
+                        }
+                        // Create a silent audio clip as a placeholder
+                        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                        const buffer = audioContext.createBuffer(1, audioContext.sampleRate * 3, audioContext.sampleRate);
+                        const source = audioContext.createBufferSource();
+                        source.buffer = buffer;
+                        
+                        // This is a placeholder. A real implementation would fetch a base64 audio file.
+                        // For this demo, we use a simple beep.
+                        const oscillator = audioContext.createOscillator();
+                        const gainNode = audioContext.createGain();
+                        oscillator.connect(gainNode);
+                        gainNode.connect(audioContext.destination);
+                        oscillator.type = 'sine';
+                        oscillator.frequency.setValueAtTime(440, audioContext.currentTime);
+                        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                        gainNode.gain.linearRampToValueAtTime(0.5, audioContext.currentTime + 0.1);
+                        gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.3);
+                        oscillator.start();
+                        oscillator.stop(audioContext.currentTime + 0.4);
+
+                        // Simulate receiving audio and creating a player
+                        outputDiv.innerHTML = '';
+                        const audioPlayer = document.createElement('audio');
+                        audioPlayer.controls = true;
+                        audioPlayer.src = "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA="; // Dummy short silent wav
+                        audioPlayer.classList.add('w-full');
+                        outputDiv.appendChild(audioPlayer);
+                        audioPlayer.play();
+                        
+                        btn.disabled = false;
+                        btn.textContent = 'Generate Cloned Voice';
+                    }, 1500);
+                });
+            }
+
+            let rigChartInstance = null;
+            function initBuildYourRig() {
+                const rigBtns = document.querySelectorAll('.rig-btn');
+                const rigNameEl = document.getElementById('rig-name');
+                const componentsEl = document.getElementById('rig-components');
+                const rigCtx = document.getElementById('rigChart').getContext('2d');
+
+                const rigData = {
+                    appetizer: {
+                        name: 'Starter Build (Appetizer)',
+                        cost: 1800,
+                        components: [
+                            { name: 'GPU', value: 'NVIDIA RTX 4070 Ti (12GB)' },
+                            { name: 'CPU', value: 'AMD Ryzen 7 7700X' },
+                            { name: 'RAM', value: '32GB DDR5' },
+                            { name: 'Storage', value: '1TB NVMe SSD' },
+                        ],
+                        vram: 12
+                    },
+                    main: {
+                        name: 'Upgraded Build (Main Course)',
+                        cost: 3500,
+                        components: [
+                            { name: 'GPU', value: 'NVIDIA RTX 4090 (24GB)' },
+                            { name: 'CPU', value: 'AMD Ryzen 7 7700X' },
+                            { name: 'RAM', value: '64GB DDR5' },
+                            { name: 'Storage', value: '1TB NVMe SSD' },
+                        ],
+                        vram: 24
+                    },
+                    dessert: {
+                        name: 'Advanced Build (Dessert)',
+                        cost: 7000,
+                        components: [
+                            { name: 'GPU', value: 'NVIDIA RTX A6000 (48GB)' },
+                            { name: 'CPU', value: 'AMD Ryzen 9 7900X' },
+                            { name: 'RAM', value: '128GB DDR5' },
+                            { name: 'Storage', value: '2TB NVMe SSD' },
+                        ],
+                        vram: 48
+                    }
+                };
+
+                function updateChart(selectedRig) {
+                    const data = rigData[selectedRig];
+                     if (rigChartInstance) {
+                        rigChartInstance.destroy();
+                    }
+                    rigChartInstance = new Chart(rigCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['VRAM (GB)', 'Cost (USD)'],
+                            datasets: [{
+                                label: data.name,
+                                data: [data.vram, data.cost],
+                                backgroundColor: ['#4F46E5', '#818CF8'],
+                                borderWidth: 1,
+                                borderColor: '#C7D2FE'
+                            }]
+                        },
+                        options: {
+                            indexAxis: 'y',
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                x: {
+                                    beginAtZero: true,
+                                    type: 'logarithmic',
+                                    ticks: {
+                                        callback: function(value, index, values) {
+                                            if (value === 10 || value === 100 || value === 1000 || value === 10000) {
+                                                return value.toLocaleString();
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                function selectRig(rig) {
+                    rigBtns.forEach(btn => btn.classList.toggle('active', btn.dataset.rig === rig));
+                    const data = rigData[rig];
+                    rigNameEl.textContent = data.name;
+                    componentsEl.innerHTML = data.components.map(c => `
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="font-semibold text-gray-700">${c.name}:</span>
+                            <span class="text-gray-600 text-right">${c.value}</span>
+                        </div>
+                    `).join('');
+                    updateChart(rig);
+                }
+
+                rigBtns.forEach(btn => {
+                    btn.addEventListener('click', () => selectRig(btn.dataset.rig));
+                });
+                
+                selectRig('appetizer'); // Default selection
+            }
+        });
+    </script>
+</body>
+</html>
