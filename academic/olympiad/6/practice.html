@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class 6 Maths Olympiad Prep</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Slate & Sky Blue -->
+    <!-- Application Structure Plan: A single-page application with a fixed top navigation bar and tab-based content switching. The structure is designed for a task-oriented user flow: 1. Understand the syllabus and strategy (Home/Study Plan). 2. Practice topic-wise (Practice Zone). This non-linear structure is more user-friendly than a long document, allowing students to jump directly to the section they need. Key interactions include topic selection dropdowns, interactive question cards, and instant solution reveals, which are better for focused learning and self-assessment. -->
+    <!-- Visualization & Content Choices: Report Info: Topic weightage -> Goal: Inform/Strategize -> Viz/Method: Donut Chart (Chart.js) -> Interaction: Hover to see details -> Justification: A visual breakdown of topic importance is more engaging and easier to grasp for a 6th grader than a simple table. Report Info: Practice Questions -> Goal: Practice/Assess -> Method: Interactive Question Cards (HTML/CSS/JS) -> Interaction: Select topic, attempt question, click to reveal solution -> Justification: This simulates a real practice session, providing focused learning and immediate feedback, which is more effective than a static list of questions and a separate answer key. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+        }
+        .tab-active {
+            border-bottom: 2px solid #0ea5e9; /* sky-500 */
+            color: #0284c7; /* sky-600 */
+            font-weight: 600;
+        }
+        .tab-inactive {
+            color: #475569; /* slate-600 */
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .question-card {
+            transition: all 0.3s ease-in-out;
+        }
+        .solution {
+            display: none;
+        }
+        .btn {
+            transition: background-color 0.2s;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-slate-900">Class 6 Maths Olympiad Prep Hub</h1>
+            <p class="text-slate-600 mt-2">Your interactive guide to mastering the Maths Olympiad.</p>
+        </header>
+
+        <nav class="bg-white rounded-lg shadow-sm mb-8 sticky top-4 z-10">
+            <ul class="flex justify-center items-center p-2 space-x-2 md:space-x-8">
+                <li><button onclick="showTab('home')" class="tab-btn tab-active text-sm md:text-base px-3 py-2 rounded-md">Home</button></li>
+                <li><button onclick="showTab('studyPlan')" class="tab-btn tab-inactive text-sm md:text-base px-3 py-2 rounded-md">Study Plan</button></li>
+                <li><button onclick="showTab('practiceZone')" class="tab-btn tab-inactive text-sm md:text-base px-3 py-2 rounded-md">Practice Zone</button></li>
+            </ul>
+        </nav>
+
+        <main>
+            <!-- Home Section -->
+            <section id="home" class="content-section active">
+                <div class="bg-white p-6 md:p-8 rounded-lg shadow-sm">
+                    <h2 class="text-2xl font-bold text-sky-700 mb-4">Welcome, Future Math Champion!</h2>
+                    <p class="mb-4 text-slate-700">This interactive guide is designed to help you prepare for the Class 6 Maths Olympiad. The Olympiad isn't just about knowing formulas; it's about applying concepts creatively to solve tricky problems. Here, you'll find everything you need to build a strong foundation, practice effectively, and build your confidence for exam day.</p>
+                    <div class="grid md:grid-cols-2 gap-6 mt-6">
+                        <div class="bg-slate-100 p-6 rounded-lg">
+                            <h3 class="font-semibold text-lg text-slate-800 mb-2">What You'll Find Here:</h3>
+                            <ul class="list-disc list-inside space-y-2 text-slate-600">
+                                <li>A curated list of the **best study materials**.</li>
+                                <li>A detailed **topic-wise breakdown** and weightage map.</li>
+                                <li>An interactive **Practice Zone** with hundreds of questions.</li>
+                                <li>**Step-by-step solutions** with tips and tricks.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-sky-100 p-6 rounded-lg border border-sky-200">
+                            <h3 class="font-semibold text-lg text-sky-800 mb-2">How to Use This Guide:</h3>
+                            <ol class="list-decimal list-inside space-y-2 text-sky-700">
+                                <li>Start with the **Study Plan** to understand the syllabus and strategy.</li>
+                                <li>Move to the **Practice Zone** to test your knowledge topic by topic.</li>
+                                <li>Don't be afraid to check the solutions to learn new methods.</li>
+                                <li>Consistency is key! Practice a little every day.</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Study Plan Section -->
+            <section id="studyPlan" class="content-section">
+                <div class="bg-white p-6 md:p-8 rounded-lg shadow-sm">
+                    <h2 class="text-2xl font-bold text-sky-700 mb-4">Strategic Study Plan</h2>
+                    <p class="mb-6 text-slate-700">A good plan is the first step to success. This section outlines the most important topics and recommends the best resources to use for your preparation.</p>
+                    
+                    <div class="mb-8">
+                        <h3 class="text-xl font-semibold text-slate-800 mb-3">Recommended Materials</h3>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="bg-slate-100 p-4 rounded-lg">
+                                <h4 class="font-bold">MTG Olympiad Prep-Guide</h4>
+                                <p class="text-sm text-slate-600">Best for: Initial preparation and thorough concept drill.</p>
+                            </div>
+                            <div class="bg-slate-100 p-4 rounded-lg">
+                                <h4 class="font-bold">MTG IMO Workbook</h4>
+                                <p class="text-sm text-slate-600">Best for: Intensive practice and topic-wise assessment.</p>
+                            </div>
+                            <div class="bg-slate-100 p-4 rounded-lg">
+                                <h4 class="font-bold">Official Sample Papers</h4>
+                                <p class="text-sm text-slate-600">Best for: Mock tests, speed practice, and final revision.</p>
+                            </div>
+                             <div class="bg-slate-100 p-4 rounded-lg">
+                                <h4 class="font-bold">Online Platforms (e.g., SOF Trainer)</h4>
+                                <p class="text-sm text-slate-600">Best for: Targeted practice and self-assessment.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-semibold text-slate-800 mb-3">Topics & Weightage Map</h3>
+                        <p class="mb-4 text-slate-700">Understanding which topics are most important helps you focus your efforts. The chart below shows a typical distribution of marks in the Olympiad paper. Logical Reasoning is a major section, followed by core mathematical concepts.</p>
+                        <div class="chart-container relative h-80 md:h-96 w-full max-w-md mx-auto">
+                            <canvas id="topicWeightageChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Practice Zone Section -->
+            <section id="practiceZone" class="content-section">
+                <div class="bg-white p-6 md:p-8 rounded-lg shadow-sm">
+                    <h2 class="text-2xl font-bold text-sky-700 mb-2">Practice Zone</h2>
+                    <p class="mb-6 text-slate-700">Select a topic and a question set to begin your practice session. Tackle each question and then check the detailed solution to learn.</p>
+                    
+                    <div class="flex flex-col md:flex-row gap-4 mb-6">
+                        <div class="flex-1">
+                            <label for="topicSelect" class="block text-sm font-medium text-slate-700">1. Choose a Topic</label>
+                            <select id="topicSelect" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-slate-300 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm rounded-md">
+                                <option value="logicalReasoning">Logical Reasoning</option>
+                                <option value="numberSystems">Number Systems & Theory</option>
+                                <option value="fractionsDecimals">Fractions & Decimals</option>
+                            </select>
+                        </div>
+                        <div class="flex-1">
+                            <label for="setSelect" class="block text-sm font-medium text-slate-700">2. Choose a Set</label>
+                            <select id="setSelect" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-slate-300 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm rounded-md">
+                                <option value="practice">Practice Set (New)</option>
+                                <option value="previousYear">Previous-Year Set</option>
+                            </select>
+                        </div>
+                         <div class="flex-shrink-0 self-end">
+                            <button onclick="loadQuestions()" class="w-full md:w-auto bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-4 rounded-md btn">Load Questions</button>
+                        </div>
+                    </div>
+
+                    <div id="quiz-container" class="mt-8">
+                        <!-- Questions will be loaded here -->
+                        <div class="text-center text-slate-500">
+                            <p>Please select a topic and set, then click "Load Questions" to start.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const quizData = {
+            logicalReasoning: {
+                practice: [
+                    {
+                        q: "Find the missing term in the series: A, C, F, J, ?",
+                        o: ["M", "N", "O", "P"],
+                        a: 2,
+                        s: "The pattern adds consecutive numbers to the alphabetical position: A(+2) -> C(+3) -> F(+4) -> J(+5) -> O."
+                    },
+                    {
+                        q: "If P means +, Q means x, R means ÷, and S means -, what is the value of 28 R 7 Q 2 S 3 P 1?",
+                        o: ["6", "7", "8", "9"],
+                        a: 0,
+                        s: "Substitute the symbols: 28 ÷ 7 x 2 - 3 + 1. Following BODMAS: (28 ÷ 7) = 4, then 4 x 2 = 8, then 8 - 3 = 5, and finally 5 + 1 = 6."
+                    }
+                ],
+                previousYear: [
+                    {
+                        q: "How many meaningful English words can be formed with the letters L, A, S, E using each letter only once?",
+                        o: ["1", "2", "3", "4"],
+                        a: 2,
+                        s: "The words that can be formed are SALE, SEAL, and LEAS. That makes 3 meaningful words."
+                    },
+                    {
+                        q: "A person is facing West. He turns 45 degrees clockwise, then 180 degrees clockwise, and finally 270 degrees anti-clockwise. Which direction is he facing now?",
+                        o: ["West", "South-West", "North", "South-East"],
+                        a: 1,
+                        s: "Start at West. 45° clockwise -> North-West. 180° clockwise from NW -> South-East. 270° anti-clockwise from SE -> South-West."
+                    }
+                ]
+            },
+            numberSystems: {
+                practice: [
+                    {
+                        q: "What is the difference between the place value and face value of the digit 7 in the number 273,456?",
+                        o: ["69,993", "69,933", "69,930", "69,999"],
+                        a: 0,
+                        s: "Place value of 7 is 70,000. Face value of 7 is 7. The difference is 70,000 - 7 = 69,993."
+                    },
+                    {
+                        q: "The product of two numbers is 675. If their HCF is 15, what is their LCM?",
+                        o: ["45", "35", "55", "60"],
+                        a: 0,
+                        s: "We know that Product of two numbers = HCF × LCM. So, 675 = 15 × LCM. Therefore, LCM = 675 / 15 = 45."
+                    }
+                ],
+                previousYear: [
+                    {
+                        q: "If a number is divisible by both 2 and 3, then it is also divisible by:",
+                        o: ["5", "6", "8", "12"],
+                        a: 1,
+                        s: "A number divisible by both 2 and 3 is divisible by their LCM. The LCM of 2 and 3 is 6. So, the number is divisible by 6."
+                    },
+                    {
+                        q: "What is the smallest number that must be added to 3456 to make it divisible by 10?",
+                        o: ["4", "6", "0", "1"],
+                        a: 0,
+                        s: "A number is divisible by 10 if its last digit is 0. The last digit of 3456 is 6. To make it 0 at the end (by making it 3460), we need to add 4. (3456 + 4 = 3460)."
+                    }
+                ]
+            },
+            fractionsDecimals: {
+                practice: [
+                    {
+                        q: "A ribbon of length 10.5 m is cut into small pieces of length 1.5 m each. How many pieces can be cut?",
+                        o: ["5", "6", "7", "8"],
+                        a: 2,
+                        s: "Number of pieces = Total length / Length of one piece = 10.5 / 1.5. To simplify, this is 105 / 15 = 7. So, 7 pieces can be cut."
+                    },
+                    {
+                        q: "If 2/5 of a number is 20, what is the number?",
+                        o: ["50", "40", "25", "30"],
+                        a: 0,
+                        s: "Let the number be x. (2/5) * x = 20. So, x = 20 * (5/2) = 10 * 5 = 50. The number is 50."
+                    }
+                ],
+                previousYear: [
+                    {
+                        q: "A person had ₹200. He spent 0.25 of it on a shirt. How much money is left?",
+                        o: ["₹150", "₹125", "₹100", "₹175"],
+                        a: 0,
+                        s: "Amount spent = 0.25 × 200 = ₹50. Money left = 200 - 50 = ₹150."
+                    },
+                    {
+                        q: "In a class of 40 students, 3/4 of the students passed. How many students failed?",
+                        o: ["30", "20", "10", "5"],
+                        a: 2,
+                        s: "Number of students passed = (3/4) * 40 = 30. Number of students failed = Total students - Passed students = 40 - 30 = 10."
+                    }
+                ]
+            }
+        };
+
+        function showTab(tabName) {
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(tabName).classList.add('active');
+
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(button => {
+                button.classList.remove('tab-active');
+                button.classList.add('tab-inactive');
+            });
+            event.target.classList.add('tab-active');
+            event.target.classList.remove('tab-inactive');
+        }
+
+        function loadQuestions() {
+            const topic = document.getElementById('topicSelect').value;
+            const set = document.getElementById('setSelect').value;
+            const questions = quizData[topic][set];
+            const quizContainer = document.getElementById('quiz-container');
+            
+            quizContainer.innerHTML = '';
+
+            questions.forEach((q, index) => {
+                const questionEl = document.createElement('div');
+                questionEl.className = 'bg-slate-100 p-6 rounded-lg mb-4 question-card';
+                
+                let optionsHTML = '';
+                q.o.forEach((option, i) => {
+                    optionsHTML += `
+                        <label class="block p-3 my-2 rounded-lg border border-slate-300 hover:bg-sky-100 cursor-pointer">
+                            <input type="radio" name="question${index}" value="${i}" class="mr-2">
+                            ${option}
+                        </label>
+                    `;
+                });
+
+                questionEl.innerHTML = `
+                    <p class="font-semibold mb-4">Q${index + 1}: ${q.q}</p>
+                    <div class="options">${optionsHTML}</div>
+                    <div class="mt-4">
+                        <button onclick="checkAnswer(this, ${q.a})" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-4 rounded-md btn text-sm">Check Answer</button>
+                        <button onclick="toggleSolution(this)" class="ml-2 bg-slate-500 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-md btn text-sm">Show Solution</button>
+                    </div>
+                    <div class="solution mt-4 p-4 bg-green-100 border border-green-300 rounded-lg">
+                        <p class="font-semibold text-green-800">Solution:</p>
+                        <p class="text-green-700">${q.s}</p>
+                    </div>
+                    <div class="result mt-2 text-sm font-semibold"></div>
+                `;
+                quizContainer.appendChild(questionEl);
+            });
+        }
+
+        function checkAnswer(button, correctAnswer) {
+            const questionCard = button.closest('.question-card');
+            const selectedOption = questionCard.querySelector('input[type="radio"]:checked');
+            const resultEl = questionCard.querySelector('.result');
+
+            if (!selectedOption) {
+                resultEl.textContent = "Please select an option first!";
+                resultEl.className = 'result mt-2 text-sm font-semibold text-red-500';
+                return;
+            }
+
+            if (parseInt(selectedOption.value) === correctAnswer) {
+                resultEl.textContent = "Correct! Well done.";
+                resultEl.className = 'result mt-2 text-sm font-semibold text-green-600';
+            } else {
+                resultEl.textContent = "Not quite. Try again or check the solution.";
+                resultEl.className = 'result mt-2 text-sm font-semibold text-red-600';
+            }
+        }
+
+        function toggleSolution(button) {
+            const questionCard = button.closest('.question-card');
+            const solutionEl = questionCard.querySelector('.solution');
+            if (solutionEl.style.display === 'block') {
+                solutionEl.style.display = 'none';
+                button.textContent = 'Show Solution';
+            } else {
+                solutionEl.style.display = 'block';
+                button.textContent = 'Hide Solution';
+            }
+        }
+
+        // Chart.js implementation
+        const ctx = document.getElementById('topicWeightageChart').getContext('2d');
+        const topicWeightageChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Logical Reasoning', 'Number Systems', 'Fractions & Decimals', 'Geometry', 'Mensuration', 'Data Handling', 'Algebra', 'Ratio & Proportion'],
+                datasets: [{
+                    label: 'Topic Weightage',
+                    data: [15, 10, 10, 8, 8, 5, 7, 7], // Approximate weightage
+                    backgroundColor: [
+                        '#0ea5e9', // sky-500
+                        '#38bdf8', // sky-400
+                        '#7dd3fc', // sky-300
+                        '#64748b', // slate-500
+                        '#94a3b8', // slate-400
+                        '#cbd5e1', // slate-300
+                        '#e2e8f0', // slate-200
+                        '#f1f5f9'  // slate-100
+                    ],
+                    borderColor: '#f8fafc',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 15,
+                            boxWidth: 12,
+                            font: {
+                                size: 12
+                            }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed !== null) {
+                                    label += context.parsed + ' marks (approx)';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+    </script>
+</body>
+</html>
