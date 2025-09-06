@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profound SaaS Company Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: Calm Harmony -->
+    <!-- Application Structure Plan: A tabbed interface dashboard. The five key research areas (Revenue, Tech, Architecture, Sales, Competitors) are presented as distinct, clickable tabs. This structure was chosen to break down the dense, qualitative report into manageable, thematic sections. It allows users to immediately grasp the report's structure and navigate directly to their area of interest, preventing cognitive overload from a long, scrolling page. The user flow is simple: land on the page, see the main overview, and click tabs to switch content views. This non-linear exploration is more efficient and user-friendly for absorbing targeted information. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: 5 distinct categories of analysis -> Goal: Organize/Inform -> Viz/Presentation: Tabbed navigation -> Interaction: Click to reveal content -> Justification: Provides clear, high-level navigation and logical separation of dense, qualitative information, improving usability. -> Library/Method: Vanilla JS + Tailwind.
+        - Report Info: Technology Stack & Product Architecture -> Goal: Explain Relationships -> Viz/Presentation: HTML/CSS diagram -> Interaction: Static visual aid -> Justification: A visual diagram communicates system structure and data flow more effectively and intuitively than bullet points alone, enhancing comprehension. -> Library/Method: HTML divs + Tailwind CSS.
+        - Report Info: Key findings in each section -> Goal: Inform -> Viz/Presentation: Styled bulleted lists -> Interaction: Static -> Justification: Presents concise points clearly and legibly. -> Library/Method: HTML + Tailwind.
+        - Report Info: Unverified information -> Goal: Highlight Uncertainty -> Viz/Presentation: Styled "Needs verification" tag -> Interaction: Static -> Justification: Clearly flags speculative points to the user, maintaining the integrity of the source report. -> Library/Method: HTML + Tailwind.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .tab-active {
+            border-color: #2563eb;
+            color: #2563eb;
+            background-color: #eff6ff;
+        }
+        .verification-tag {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #b91c1c;
+            background-color: #fee2e2;
+            padding: 2px 6px;
+            border-radius: 9999px;
+            margin-left: 8px;
+            display: inline-block;
+        }
+        .flow-line {
+            position: relative;
+            border-color: #9ca3af;
+        }
+        .flow-line::after {
+            content: '▶';
+            position: absolute;
+            top: 50%;
+            right: -0.75rem;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            font-size: 0.7rem;
+        }
+        @media (max-width: 768px) {
+            .flow-line {
+                border-right-width: 0;
+                border-bottom-width: 2px;
+                padding-bottom: 2rem;
+                margin-right: 0;
+            }
+            .flow-line::after {
+                top: auto;
+                bottom: -0.75rem;
+                left: 50%;
+                transform: translateX(-50%) rotate(90deg);
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+</head>
+<body class="bg-stone-50 text-stone-800">
+
+    <div id="app" class="container mx-auto p-4 md:p-8 max-w-5xl">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-stone-900">Profound: Company Analysis</h1>
+            <p class="mt-2 text-stone-600 max-w-2xl mx-auto">
+                This interactive dashboard provides a research-based analysis of the SaaS company Profound. Explore the different facets of their business, from revenue models to their competitive landscape, by selecting a category below.
+            </p>
+        </header>
+
+        <nav class="flex flex-wrap justify-center border-b-2 border-stone-200 mb-8 gap-2">
+            <button data-target="revenue" class="nav-tab py-3 px-4 text-sm md:text-base font-semibold border-b-4 border-transparent hover:bg-stone-100 transition-colors">💰 Revenue Model</button>
+            <button data-target="tech" class="nav-tab py-3 px-4 text-sm md:text-base font-semibold border-b-4 border-transparent hover:bg-stone-100 transition-colors">⚙️ Technology</button>
+            <button data-target="architecture" class="nav-tab py-3 px-4 text-sm md:text-base font-semibold border-b-4 border-transparent hover:bg-stone-100 transition-colors">🏗️ Architecture</button>
+            <button data-target="sales" class="nav-tab py-3 px-4 text-sm md:text-base font-semibold border-b-4 border-transparent hover:bg-stone-100 transition-colors">📈 Sales Strategy</button>
+            <button data-target="competitors" class="nav-tab py-3 px-4 text-sm md:text-base font-semibold border-b-4 border-transparent hover:bg-stone-100 transition-colors">⚔️ Competitors</button>
+        </nav>
+
+        <main id="content-container">
+            <!-- Revenue Model Content -->
+            <div id="revenue-content" class="content-section">
+                 <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h2 class="text-2xl font-bold mb-4">Revenue Model</h2>
+                    <ul class="space-y-3 list-disc list-inside text-stone-700">
+                        <li>The company primarily uses a B2B SaaS subscription model, with revenue generated from recurring fees.</li>
+                        <li>Pricing is likely tiered, based on factors such as the number of user seats, volume of data analyzed, or access to premium features.</li>
+                        <li>A strong focus on "Request a Demo" suggests an enterprise sales model targeting mid-market to large companies, rather than a self-serve or freemium approach.</li>
+                        <li>Potential for additional revenue streams through professional services, such as implementation support or custom integration for large enterprise clients.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Technology Content -->
+            <div id="tech-content" class="content-section hidden">
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h2 class="text-2xl font-bold mb-4">Technology & Architecture</h2>
+                     <ul class="space-y-3 list-disc list-inside text-stone-700">
+                        <li>The frontend is likely a modern JavaScript single-page application (SPA) using a framework like React or Next.js for a dynamic user experience.<span class="verification-tag">Needs verification</span></li>
+                        <li>Backend is probably built on Python, leveraging its extensive libraries for AI and machine learning (e.g., Hugging Face Transformers, spa spaCy) to power the data analysis features.<span class="verification-tag">Needs verification</span></li>
+                        <li>Cloud infrastructure is almost certainly hosted on a major provider like AWS, GCP, or Azure to ensure scalability and access to managed services for databases and ML model deployment.<span class="verification-tag">Needs verification</span></li>
+                        <li>Utilizes a combination of databases: a relational database (e.g., PostgreSQL) for user and transactional data, and a vector database (e.g., Pinecone) for efficient similarity search on unstructured text embeddings.<span class="verification-tag">Needs verification</span></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Architecture Content -->
+            <div id="architecture-content" class="content-section hidden">
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h2 class="text-2xl font-bold mb-4">Product Architecture Overview</h2>
+                    <p class="mb-6 text-stone-600">The system likely follows a modern microservices architecture to separate concerns and allow for independent scaling of components. The diagram below illustrates the high-level data flow from user interaction on the frontend to data processing and analysis on the backend.</p>
+                    <div class="grid md:grid-cols-4 gap-4 items-center text-center text-sm">
+                        <div class="p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
+                            <h3 class="font-bold">Frontend (SPA)</h3>
+                            <p class="text-xs text-blue-700">User interacts, uploads data, views dashboards.</p>
+                        </div>
+                        <div class="flow-line border-r-2 md:border-r-2 pr-8"></div>
+                        <div class="p-4 bg-green-50 rounded-lg border-2 border-green-200">
+                             <h3 class="font-bold">API Layer</h3>
+                             <p class="text-xs text-green-700">Receives requests, authenticates users, routes traffic.</p>
+                        </div>
+                         <div class="flow-line border-r-2 md:border-r-2 pr-8"></div>
+                        <div class="p-4 bg-purple-50 rounded-lg border-2 border-purple-200">
+                            <h3 class="font-bold">Backend Services</h3>
+                             <p class="text-xs text-purple-700">Handles data ingestion, integrations, and business logic.</p>
+                        </div>
+                        <div class="flow-line border-r-2 md:border-r-2 pr-8"></div>
+                        <div class="p-4 bg-yellow-50 rounded-lg border-2 border-yellow-200">
+                           <h3 class="font-bold">AI & Data Layer</h3>
+                           <p class="text-xs text-yellow-700">Transcription, NLP analysis, and data storage in various databases.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sales Strategy Content -->
+            <div id="sales-content" class="content-section hidden">
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h2 class="text-2xl font-bold mb-4">Sales & Growth Strategy</h2>
+                    <ul class="space-y-3 list-disc list-inside text-stone-700">
+                        <li>Employs a sales-led growth (SLG) model, relying on a direct sales team to engage with prospects, provide demos, and close enterprise deals.</li>
+                        <li>Targets specific B2B personas, including product managers, UX researchers, designers, and marketing teams within tech companies.</li>
+                        <li>Leverages content marketing (blog posts, case studies) to generate inbound leads and establish thought leadership in the user research space.</li>
+                        <li>Focuses on integration-led growth by connecting with popular tools like Zapier, Slack, and Calendly, embedding Profound into existing customer workflows.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Competitors Content -->
+            <div id="competitors-content" class="content-section hidden">
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h2 class="text-2xl font-bold mb-4">Competitive Landscape</h2>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h3 class="font-semibold text-lg mb-2">Direct Competitors</h3>
+                            <ul class="space-y-2 list-disc list-inside text-stone-700">
+                                <li><strong>Dovetail:</strong> A popular research repository and analysis platform.</li>
+                                <li><strong>Sprig:</strong> Focuses on in-product surveys and concept testing.</li>
+                                <li><strong>Gong / Chorus.ai:</strong> Primarily for sales intelligence but uses similar conversation analysis technology.</li>
+                                <li><strong>Grain:</strong> AI tool for recording, transcribing, and summarizing video meetings.</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-lg mb-2">Indirect Competitors</h3>
+                            <ul class="space-y-2 list-disc list-inside text-stone-700">
+                                <li><strong>Survey Platforms:</strong> Tools like SurveyMonkey and Typeform, which collect feedback that is often analyzed manually.</li>
+                                <li><strong>Broad Research Platforms:</strong> Large-scale solutions like UserTesting and Qualtrics that cover a wider range of research activities.</li>
+                                <li><strong>Manual Toolchains:</strong> The combination of transcription services (e.g., Otter.ai) with spreadsheets or note-taking apps.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const tabs = document.querySelectorAll('.nav-tab');
+            const contentSections = document.querySelectorAll('.content-section');
+
+            function switchTab(targetId) {
+                contentSections.forEach(section => {
+                    section.classList.add('hidden');
+                });
+                tabs.forEach(tab => {
+                    tab.classList.remove('tab-active');
+                });
+
+                const activeTab = document.querySelector(`button[data-target="${targetId}"]`);
+                const activeContent = document.getElementById(`${targetId}-content`);
+                
+                if (activeTab && activeContent) {
+                    activeTab.classList.add('tab-active');
+                    activeContent.classList.remove('hidden');
+                }
+            }
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const target = tab.getAttribute('data-target');
+                    switchTab(target);
+                });
+            });
+
+            switchTab('revenue');
+        });
+    </script>
+
+</body>
+</html>
