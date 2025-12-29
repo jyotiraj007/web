@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roza Jalalpur RWA Formation Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* * Chosen Palette: 'Community Trust'
+         * Background: Warm Neutral (Stone-50) for a calm, document-like feel.
+         * Primary: Deep Teal (Teal-800) for authority and stability.
+         * Accent: Vibrant Emerald (Emerald-600) for calls to action and progress.
+         * Text: Slate-800 for high readability.
+         */
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #fafaf9; /* tailwind stone-50 */
+            color: #1e293b; /* tailwind slate-800 */
+        }
+
+        /* Custom Chart Container Styling as per requirements */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px; /* Base height */
+            max-height: 400px;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+
+        /* Hide scrollbar for clean navigation */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Interactive Element Transitions */
+        .interactive-card {
+            transition: all 0.3s ease;
+        }
+        .interactive-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Step connector line */
+        .step-connector::after {
+            content: '';
+            position: absolute;
+            top: 2rem;
+            bottom: 0;
+            left: 1rem;
+            width: 2px;
+            background-color: #e5e7eb; /* gray-200 */
+            z-index: 0;
+        }
+        .step-item:last-child .step-connector::after {
+            display: none;
+        }
+    </style>
+    <!-- 
+    Application Structure Plan:
+    1. Header/Hero: Immediate context setting ("Roza Jalalpur RWA") and navigation.
+    2. Interactive Roadmap (Main View): A vertical step-by-step accordion. This is the core 'User Journey' from idea to registration. 
+       Why: Users need a linear path to follow.
+    3. Dashboard (Data View): Charts for Time and Cost. 
+       Why: Managing expectations is critical for volunteer committees.
+    4. Compliance & Adabi Context (Info View): Text-heavy but structured section on the specific legal nuance of Abadi land.
+       Why: This is the specific "Consultant" value add.
+    5. Tools (Utility View): Checklists and WhatsApp generator.
+       Why: Actionable takeaways to drive progress.
+    -->
+    <!-- 
+    Visualization & Content Choices:
+    - Roadmap: HTML/CSS Accordion. Goal: Process Flow. Interaction: Click to expand details. No SVG.
+    - Cost Breakdown: Chart.js Doughnut. Goal: Inform/Budget. Interaction: Hover for values.
+    - Timeline: Chart.js Bar (Horizontal). Goal: Expectation management. Interaction: Compare stages.
+    - Checklist: Dynamic HTML list with JS state. Goal: Progress tracking.
+    - Icons: Unicode characters (e.g., 🏛️, 📋) to ensure no SVG dependency.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="bg-stone-50 min-h-screen flex flex-col">
+
+    <!-- Navigation Bar -->
+    <nav class="bg-teal-900 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-2">
+                    <span class="text-2xl">🏛️</span>
+                    <span class="font-bold text-lg tracking-wide">Colony RWA Guide</span>
+                </div>
+                <!-- Desktop Nav -->
+                <div class="hidden md:flex space-x-6">
+                    <button onclick="app.navigate('roadmap')" class="hover:text-emerald-300 transition px-3 py-2 rounded-md font-medium nav-btn" data-target="roadmap">Roadmap</button>
+                    <button onclick="app.navigate('dashboard')" class="hover:text-emerald-300 transition px-3 py-2 rounded-md font-medium nav-btn" data-target="dashboard">Costs & Timeline</button>
+                    <button onclick="app.navigate('legal')" class="hover:text-emerald-300 transition px-3 py-2 rounded-md font-medium nav-btn" data-target="legal">Adabi & Legal</button>
+                    <button onclick="app.navigate('tools')" class="hover:text-emerald-300 transition px-3 py-2 rounded-md font-medium nav-btn" data-target="tools">Checklist & Tools</button>
+                </div>
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden">
+                    <button onclick="app.toggleMobileMenu()" class="text-white hover:text-emerald-300 focus:outline-none text-2xl">
+                        ☰
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Nav Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-teal-800 pb-4">
+            <button onclick="app.navigate('roadmap')" class="block w-full text-left px-4 py-2 hover:bg-teal-700">Roadmap</button>
+            <button onclick="app.navigate('dashboard')" class="block w-full text-left px-4 py-2 hover:bg-teal-700">Costs & Timeline</button>
+            <button onclick="app.navigate('legal')" class="block w-full text-left px-4 py-2 hover:bg-teal-700">Adabi & Legal</button>
+            <button onclick="app.navigate('tools')" class="block w-full text-left px-4 py-2 hover:bg-teal-700">Checklist & Tools</button>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-6xl mx-auto w-full px-4 py-8">
+        
+        <!-- Welcome / Context Section -->
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-teal-900 mb-3">Roza Jalalpur RWA Formation</h1>
+            <p class="text-lg text-stone-600 max-w-3xl mx-auto">
+                A complete guide for residents of freehold plotted colonies on <strong>Adabi Land</strong> in Greater Noida West. 
+                Establish legal standing, manage utilities, and build a community.
+            </p>
+        </header>
+
+        <!-- VIEW: ROADMAP (Default) -->
+        <section id="roadmap-view" class="view-section">
+            <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6 mb-6">
+                <h2 class="text-2xl font-bold text-teal-800 mb-4 flex items-center">
+                    <span class="mr-2">📍</span> The Formation Journey
+                </h2>
+                <p class="text-stone-600 mb-6">
+                    Setting up an RWA under the <strong>Societies Registration Act, 1860</strong> involves specific legal steps. 
+                    Follow this roadmap to ensure compliance for your plotted colony.
+                </p>
+
+                <div class="space-y-0 relative" id="roadmap-container">
+                    <!-- JS will populate steps here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: DASHBOARD (Costs & Time) -->
+        <section id="dashboard-view" class="view-section hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                <!-- Cost Estimator -->
+                <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
+                    <h2 class="text-xl font-bold text-teal-800 mb-2">💰 Estimated Expenses</h2>
+                    <p class="text-sm text-stone-500 mb-6">Breakdown of costs for registration and professional assistance.</p>
+                    
+                    <div class="chart-container">
+                        <canvas id="costChart"></canvas>
+                    </div>
+                    
+                    <div class="mt-4 p-4 bg-stone-50 rounded-lg">
+                        <h3 class="font-semibold text-teal-900">Summary</h3>
+                        <ul class="text-sm text-stone-700 mt-2 space-y-1">
+                            <li class="flex justify-between"><span>Govt. Fees:</span> <span>₹ 2,000 - 5,000</span></li>
+                            <li class="flex justify-between"><span>Documentation:</span> <span>₹ 3,000 - 5,000</span></li>
+                            <li class="flex justify-between"><span>Consultant (Optional):</span> <span>₹ 15,000+</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Timeline Estimator -->
+                <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
+                    <h2 class="text-xl font-bold text-teal-800 mb-2">⏳ Timeline Expectations</h2>
+                    <p class="text-sm text-stone-500 mb-6">Realistic timeframes for each stage of the process.</p>
+                    
+                    <div class="chart-container">
+                        <canvas id="timeChart"></canvas>
+                    </div>
+
+                    <div class="mt-4 p-4 bg-teal-50 rounded-lg border border-teal-100">
+                        <p class="text-sm text-teal-800">
+                            <strong>Note:</strong> Timelines depend heavily on the Registrar's workload in Meerut/Noida and the accuracy of your documents. 
+                            The "Preparation" phase is entirely in your control.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- VIEW: LEGAL (Adabi & Rules) -->
+        <section id="legal-view" class="view-section hidden">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                <!-- Main Legal Context -->
+                <div class="md:col-span-2 space-y-6">
+                    <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
+                        <h2 class="text-2xl font-bold text-teal-800 mb-4">⚖️ Legal Framework & Adabi Land</h2>
+                        
+                        <div class="mb-6">
+                            <h3 class="text-lg font-bold text-emerald-700 mb-2">What is an RWA here?</h3>
+                            <p class="text-stone-700 leading-relaxed">
+                                In Uttar Pradesh, an RWA is registered as a <strong>Society</strong> under the <em>Societies Registration Act, 1860</em>. 
+                                It is a voluntary association of residents formed to manage common affairs. It is <strong>not</strong> a statutory government body but has legal standing to represent residents.
+                            </p>
+                        </div>
+
+                        <div class="mb-6 p-4 bg-amber-50 border-l-4 border-amber-500 rounded-r-lg">
+                            <h3 class="text-lg font-bold text-amber-800 mb-2">The "Adabi" (Abadi) Land Context</h3>
+                            <p class="text-stone-700 text-sm mb-2">
+                                <strong>Context:</strong> Your colony is on Abadi land (old village settlement area). This differs from GNIDA-allotted sector land.
+                            </p>
+                            <ul class="list-disc list-inside text-stone-700 text-sm space-y-2">
+                                <li><strong>Registration Eligibility:</strong> You <strong>CAN</strong> form an RWA. The Registrar of Societies requires address proof (Registry/Sale Deed), which you possess. The land classification does not bar you from forming a welfare society.</li>
+                                <li><strong>GNIDA Role:</strong> Unlike Sector RWAs, GNIDA does not typically hand over maintenance officially to Abadi RWAs immediately. However, an RWA gives you a collective voice to petition GNIDA for connecting main roads, sewer lines, and water supply.</li>
+                                <li><strong>Property Title:</strong> RWA registration does not validate land title; your Sale Deed (Registry) does that. The RWA manages "Common Interest," not ownership disputes.</li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h3 class="text-lg font-bold text-emerald-700 mb-2">Post-Registration Responsibilities</h3>
+                            <ul class="space-y-2 text-stone-700">
+                                <li class="flex items-start"><span class="mr-2 text-emerald-600">✓</span> Open a Bank Account (in RWA name).</li>
+                                <li class="flex items-start"><span class="mr-2 text-emerald-600">✓</span> Apply for PAN Card.</li>
+                                <li class="flex items-start"><span class="mr-2 text-emerald-600">✓</span> Annual General Meeting (AGM) once a year.</li>
+                                <li class="flex items-start"><span class="mr-2 text-emerald-600">✓</span> File Annual List of Governing Body with the Registrar (Critical for renewal).</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Reference Sidebar -->
+                <div class="md:col-span-1 space-y-6">
+                    <div class="bg-teal-900 text-white rounded-xl shadow-md p-6">
+                        <h3 class="text-lg font-bold mb-4">Key Authorities</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <h4 class="font-bold text-emerald-300 text-sm">Registrar</h4>
+                                <p class="text-sm text-teal-100">Deputy Registrar, Firms, Societies & Chits (Meerut/Noida Division).</p>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-emerald-300 text-sm">Local Authority</h4>
+                                <p class="text-sm text-teal-100">Greater Noida Industrial Development Authority (GNIDA).</p>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-emerald-300 text-sm">Police Station</h4>
+                                <p class="text-sm text-teal-100">Bisrakh Police Station (Jurisdiction for Roza Jalalpur).</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
+                        <h3 class="text-lg font-bold text-red-700 mb-3">⚠️ Common Pitfalls</h3>
+                        <ul class="text-sm text-stone-600 space-y-3">
+                            <li class="flex items-start">
+                                <span class="mr-2">❌</span>
+                                <span><strong>Non-Renewal:</strong> Forgetting to file the annual list leads to status "defunct" after 5 years.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="mr-2">❌</span>
+                                <span><strong>Quorum Issues:</strong> Decisions made without minimum member presence can be challenged in court.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="mr-2">❌</span>
+                                <span><strong>Personal Accounts:</strong> Never collect maintenance in a personal bank account.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: TOOLS (Checklist & WhatsApp) -->
+        <section id="tools-view" class="view-section hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                <!-- Interactive Checklist -->
+                <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold text-teal-800">📋 Readiness Checklist</h2>
+                        <span id="progress-text" class="text-sm font-bold text-emerald-600">0% Ready</span>
+                    </div>
+                    
+                    <div class="w-full bg-stone-200 rounded-full h-2.5 mb-6">
+                        <div id="progress-bar" class="bg-emerald-600 h-2.5 rounded-full" style="width: 0%"></div>
+                    </div>
+
+                    <div class="space-y-3" id="checklist-container">
+                        <!-- Checklist items injected via JS -->
+                    </div>
+                </div>
+
+                <!-- WhatsApp Generator -->
+                <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6 flex flex-col">
+                    <h2 class="text-xl font-bold text-teal-800 mb-4">📱 Colony Update Generator</h2>
+                    <p class="text-sm text-stone-600 mb-4">Draft a professional message to share with residents about the RWA initiative.</p>
+                    
+                    <div class="bg-emerald-50 border border-emerald-100 rounded-lg p-4 flex-grow mb-4 font-mono text-sm text-stone-800 whitespace-pre-wrap" id="whatsapp-preview" contenteditable="true">
+📢 *RWA Formation Update: Roza Jalalpur*
+
+Dear Residents,
+
+We are initiating the process to form a legal RWA for our colony. This will help us manage security, waste, and represent us before GNIDA.
+
+*Current Status:*
+✅ Core Team forming
+📝 Drafting Bye-laws
+📅 Next Meeting: [Date/Time]
+
+We need 7+ owners with Registry copies to sign as founding members.
+
+Let's build a better community! 🏘️
+                    </div>
+
+                    <button onclick="app.copyToClipboard()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded transition flex justify-center items-center">
+                        <span class="mr-2">📋</span> Copy Message
+                    </button>
+                    <p id="copy-feedback" class="text-center text-sm text-emerald-600 mt-2 opacity-0 transition">Copied to clipboard!</p>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-stone-100 border-t border-stone-200 py-8 mt-auto">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <p class="text-stone-500 text-sm">
+                <strong>Disclaimer:</strong> This guide is for informational purposes. Laws regarding RWA registration in UP can change. 
+                Always verify with the Deputy Registrar's office in Meerut/Noida or consult a local legal professional before filing.
+            </p>
+            <p class="text-stone-400 text-xs mt-2">Designed for Roza Jalalpur Residents • 2024</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        const app = {
+            state: {
+                currentView: 'roadmap',
+                checklist: [
+                    { id: 1, text: "Identify 7 Founding Members (Owners)", checked: false },
+                    { id: 2, text: "Collect Sale Deed Copies (Registry)", checked: false },
+                    { id: 3, text: "Collect Aadhaar/PAN of 7 Members", checked: false },
+                    { id: 4, text: "Draft Memorandum of Association (MoA)", checked: false },
+                    { id: 5, text: "Draft Rules & Regulations (Bye-laws)", checked: false },
+                    { id: 6, text: "Proof of Registered Office (Electricity Bill)", checked: false },
+                    { id: 7, text: "Affidavits (No blood relation among execs)", checked: false },
+                    { id: 8, text: "Prepare Registration Fees (Bank Draft/Challan)", checked: false }
+                ]
+            },
+
+            // Navigation Logic
+            navigate: (targetId) => {
+                // Update State
+                app.state.currentView = targetId;
+
+                // Toggle Sections
+                document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+                document.getElementById(`${targetId}-view`).classList.remove('hidden');
+
+                // Update Nav Styling
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    if (btn.dataset.target === targetId) {
+                        btn.classList.add('bg-teal-800', 'text-white');
+                        btn.classList.remove('hover:text-emerald-300');
+                    } else {
+                        btn.classList.remove('bg-teal-800', 'text-white');
+                        btn.classList.add('hover:text-emerald-300');
+                    }
+                });
+
+                // Scroll to top
+                window.scrollTo(0, 0);
+
+                // Mobile menu close
+                document.getElementById('mobile-menu').classList.add('hidden');
+            },
+
+            toggleMobileMenu: () => {
+                const menu = document.getElementById('mobile-menu');
+                menu.classList.toggle('hidden');
+            },
+
+            // Roadmap Data & Rendering
+            renderRoadmap: () => {
+                const container = document.getElementById('roadmap-container');
+                const steps = [
+                    {
+                        title: "1. Core Group Formation",
+                        icon: "👥",
+                        desc: "Form a governing body of at least 7 members.",
+                        details: "<strong>Requirement:</strong> Minimum 7 members (President, Secretary, Treasurer, etc.).<br><strong>Rule:</strong> They cannot be blood relatives.<br><strong>Docs:</strong> Collect ID proofs and Registry copies early."
+                    },
+                    {
+                        title: "2. Drafting Constitution",
+                        icon: "📜",
+                        desc: "Prepare the MoA and Bye-laws.",
+                        details: "<strong>MoA:</strong> Name of Society, Objectives (Welfare, Maintenance).<br><strong>Bye-laws:</strong> Rules for elections, membership fees, and meetings.<br><strong>Tip:</strong> Use standard UP Society templates but customize for 'Plotted Colony'."
+                    },
+                    {
+                        title: "3. Documentation",
+                        icon: "📂",
+                        desc: "Notarize affidavits and organize proof.",
+                        details: "<strong>Affidavits:</strong> Sworn on Rs. 10/20 stamp paper stating clean records.<br><strong>Office Proof:</strong> NOC from owner of the property used as RWA office (can be a resident's home)."
+                    },
+                    {
+                        title: "4. Submission",
+                        icon: "🏢",
+                        desc: "Submit to Deputy Registrar (Firms & Societies).",
+                        details: "<strong>Process:</strong> File online via UP Nivesh Mitra portal or visit the Meerut/Noida office.<br><strong>Fees:</strong> Govt fee is approx Rs. 1000-2000 depending on members.<br><strong>Timeline:</strong> 1-3 months for scrutiny."
+                    },
+                    {
+                        title: "5. Post-Registration",
+                        icon: "✅",
+                        desc: "Bank account and recognition.",
+                        details: "<strong>Banking:</strong> Use the Registration Certificate to open an account.<br><strong>Tax:</strong> Apply for PAN.<br><strong>Handover:</strong> Formally write to GNIDA informing them of the RWA formation."
+                    }
+                ];
+
+                container.innerHTML = steps.map((step, index) => `
+                    <div class="step-item relative pl-8 pb-8 ${index === steps.length - 1 ? '' : 'step-connector'}">
+                        <div class="absolute left-0 top-0 bg-teal-100 text-teal-800 w-8 h-8 rounded-full flex items-center justify-center font-bold border-2 border-teal-500 z-10">
+                            ${index + 1}
+                        </div>
+                        <div class="bg-stone-50 p-4 rounded-lg border border-stone-200 interactive-card cursor-pointer" onclick="app.toggleStep(this)">
+                            <div class="flex justify-between items-center">
+                                <h3 class="text-lg font-bold text-teal-900">${step.icon} ${step.title}</h3>
+                                <span class="text-xl text-teal-600 transform transition-transform duration-200">expand_more</span>
+                            </div>
+                            <p class="text-stone-600 text-sm mt-1">${step.desc}</p>
+                            <div class="hidden mt-3 pt-3 border-t border-stone-200 text-stone-700 text-sm bg-white p-2 rounded">
+                                ${step.details}
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            },
+
+            toggleStep: (element) => {
+                const details = element.querySelector('div.hidden, div.block');
+                const icon = element.querySelector('.transform');
+                
+                if (details.classList.contains('hidden')) {
+                    details.classList.remove('hidden');
+                    details.classList.add('block');
+                    icon.style.transform = 'rotate(180deg)';
+                } else {
+                    details.classList.add('hidden');
+                    details.classList.remove('block');
+                    icon.style.transform = 'rotate(0deg)';
+                }
+            },
+
+            // Checklist Logic
+            renderChecklist: () => {
+                const container = document.getElementById('checklist-container');
+                container.innerHTML = app.state.checklist.map(item => `
+                    <div class="flex items-center p-3 bg-stone-50 rounded border border-stone-200">
+                        <input type="checkbox" id="check-${item.id}" 
+                            class="w-5 h-5 text-emerald-600 rounded focus:ring-emerald-500 border-gray-300"
+                            ${item.checked ? 'checked' : ''}
+                            onchange="app.updateChecklist(${item.id})">
+                        <label for="check-${item.id}" class="ml-3 text-stone-700 text-sm font-medium ${item.checked ? 'line-through text-stone-400' : ''}">
+                            ${item.text}
+                        </label>
+                    </div>
+                `).join('');
+                app.updateProgress();
+            },
+
+            updateChecklist: (id) => {
+                const item = app.state.checklist.find(i => i.id === id);
+                item.checked = !item.checked;
+                app.renderChecklist();
+            },
+
+            updateProgress: () => {
+                const total = app.state.checklist.length;
+                const checked = app.state.checklist.filter(i => i.checked).length;
+                const percent = Math.round((checked / total) * 100);
+                
+                document.getElementById('progress-bar').style.width = `${percent}%`;
+                document.getElementById('progress-text').innerText = `${percent}% Ready`;
+            },
+
+            // Utility
+            copyToClipboard: () => {
+                const text = document.getElementById('whatsapp-preview').innerText;
+                const feedback = document.getElementById('copy-feedback');
+                
+                // Use fallback for security context if needed, but execCommand often works in simple contexts
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+
+                feedback.style.opacity = '1';
+                setTimeout(() => { feedback.style.opacity = '0'; }, 2000);
+            },
+
+            // Charts Initialization
+            initCharts: () => {
+                // Cost Chart
+                const costCtx = document.getElementById('costChart').getContext('2d');
+                new Chart(costCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Govt Registration Fees', 'Notary & Stamps', 'Legal Consultant', 'Misc Admin'],
+                        datasets: [{
+                            data: [2000, 3500, 15000, 2000],
+                            backgroundColor: ['#0d9488', '#14b8a6', '#f59e0b', '#78716c'], // teal-600, teal-500, amber-500, stone-500
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return ' ₹ ' + context.raw;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Time Chart
+                const timeCtx = document.getElementById('timeChart').getContext('2d');
+                new Chart(timeCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Preparation', 'Documentation', 'Govt Processing', 'Post-Reg Setup'],
+                        datasets: [{
+                            label: 'Estimated Days',
+                            data: [14, 7, 60, 10],
+                            backgroundColor: '#0f766e', // teal-700
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: { beginAtZero: true, title: { display: true, text: 'Days' } }
+                        },
+                        plugins: {
+                            legend: { display: false }
+                        }
+                    }
+                });
+            },
+
+            init: () => {
+                app.renderRoadmap();
+                app.renderChecklist();
+                // Set initial active state
+                app.navigate('roadmap');
+                // Init charts when Dashboard is accessed or pre-load
+                // (Chart.js works best if canvas is visible, but we can init and it will render when tab switches)
+                setTimeout(app.initCharts, 500); 
+            }
+        };
+
+        // Start App
+        document.addEventListener('DOMContentLoaded', app.init);
+    </script>
+</body>
+</html>
