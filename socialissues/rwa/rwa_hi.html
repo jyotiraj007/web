@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>रोजा जलालपुर RWA गठन मार्गदर्शिका</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Chosen Palette: 'Community Trust' (Hindi Adapted) */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #fafaf9; /* stone-50 */
+            color: #1e293b; /* slate-800 */
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+
+        .interactive-card {
+            transition: all 0.3s ease;
+        }
+        .interactive-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .step-connector::after {
+            content: '';
+            position: absolute;
+            top: 2rem;
+            bottom: 0;
+            left: 1rem;
+            width: 2px;
+            background-color: #e5e7eb;
+            z-index: 0;
+        }
+    </style>
+    <!-- 
+    Application Structure Plan:
+    1. Header: Context for Roza Jalalpur RWA in Hindi.
+    2. Process Roadmap: Vertical accordion in Hindi explaining the 5 steps.
+    3. Dashboard: Charts in Hindi for Budgeting and Timeline.
+    4. Legal Deep Dive: Addressing 'Abadi Land' nuances specifically for the user's context.
+    5. Tools: Checklist and a Hindi WhatsApp template for community outreach.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="bg-stone-50 min-h-screen flex flex-col">
+
+    <!-- Navigation -->
+    <nav class="bg-teal-900 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-2">
+                    <span class="text-2xl">🏛️</span>
+                    <span class="font-bold text-lg tracking-wide">कॉलोनी RWA गाइड</span>
+                </div>
+                <div class="hidden md:flex space-x-6">
+                    <button onclick="app.navigate('roadmap')" class="hover:text-emerald-300 transition px-3 py-2 rounded-md font-medium nav-btn" data-target="roadmap">प्रक्रिया (Roadmap)</button>
+                    <button onclick="app.navigate('dashboard')" class="hover:text-emerald-300 transition px-3 py-2 rounded-md font-medium nav-btn" data-target="dashboard">खर्च और समय</button>
+                    <button onclick="app.navigate('legal')" class="hover:text-emerald-300 transition px-3 py-2 rounded-md font-medium nav-btn" data-target="legal">कानूनी स्थिति</button>
+                    <button onclick="app.navigate('tools')" class="hover:text-emerald-300 transition px-3 py-2 rounded-md font-medium nav-btn" data-target="tools">चेकलिस्ट और टूल</button>
+                </div>
+                <div class="md:hidden">
+                    <button onclick="app.toggleMobileMenu()" class="text-white text-2xl">☰</button>
+                </div>
+            </div>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden bg-teal-800 pb-4">
+            <button onclick="app.navigate('roadmap')" class="block w-full text-left px-4 py-2 hover:bg-teal-700">प्रक्रिया</button>
+            <button onclick="app.navigate('dashboard')" class="block w-full text-left px-4 py-2 hover:bg-teal-700">खर्च और समय</button>
+            <button onclick="app.navigate('legal')" class="block w-full text-left px-4 py-2 hover:bg-teal-700">कानूनी स्थिति</button>
+            <button onclick="app.navigate('tools')" class="block w-full text-left px-4 py-2 hover:bg-teal-700">चेकलिस्ट और टूल</button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-6xl mx-auto w-full px-4 py-8">
+        
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-teal-900 mb-3">रोजा जलालपुर RWA गठन गाइड</h1>
+            <p class="text-lg text-stone-600 max-w-3xl mx-auto">
+                ग्रेटर नोएडा वेस्ट की <strong>आबादी भूमि (Abadi Land)</strong> पर स्थित कॉलोनियों के लिए RWA बनाने की विस्तृत जानकारी।
+            </p>
+        </header>
+
+        <!-- VIEW: ROADMAP -->
+        <section id="roadmap-view" class="view-section">
+            <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6 mb-6">
+                <h2 class="text-2xl font-bold text-teal-800 mb-4 flex items-center">
+                    <span class="mr-2">📍</span> RWA गठन की यात्रा
+                </h2>
+                <p class="text-stone-600 mb-6">
+                    उत्तर प्रदेश में <strong>सोसाइटी पंजीकरण अधिनियम, 1860</strong> के तहत RWA बनाने के लिए इन चरणों का पालन करें:
+                </p>
+
+                <div class="space-y-0 relative" id="roadmap-container">
+                    <!-- JS population -->
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: DASHBOARD -->
+        <section id="dashboard-view" class="view-section hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
+                    <h2 class="text-xl font-bold text-teal-800 mb-2">💰 अनुमानित खर्च (Estimate)</h2>
+                    <p class="text-sm text-stone-500 mb-6">पंजीकरण और कानूनी दस्तावेजों पर संभावित व्यय।</p>
+                    <div class="chart-container">
+                        <canvas id="costChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
+                    <h2 class="text-xl font-bold text-teal-800 mb-2">⏳ संभावित समय सीमा</h2>
+                    <p class="text-sm text-stone-500 mb-6">प्रत्येक चरण में लगने वाला अनुमानित समय (दिनों में)।</p>
+                    <div class="chart-container">
+                        <canvas id="timeChart"></canvas>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- VIEW: LEGAL -->
+        <section id="legal-view" class="view-section hidden">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="md:col-span-2 space-y-6">
+                    <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
+                        <h2 class="text-2xl font-bold text-teal-800 mb-4">⚖️ कानूनी ढांचा और आबादी भूमि</h2>
+                        
+                        <div class="mb-6 p-4 bg-amber-50 border-l-4 border-amber-500 rounded-r-lg">
+                            <h3 class="text-lg font-bold text-amber-800 mb-2">"आबादी" भूमि का RWA पर प्रभाव</h3>
+                            <ul class="list-disc list-inside text-stone-700 text-sm space-y-2">
+                                <li><strong>पंजीकरण की पात्रता:</strong> आपकी भूमि "आबादी" श्रेणी की है, लेकिन आपके पास 'रजिस्ट्री' (Sale Deed) है, तो आप कानूनी रूप से RWA बना सकते हैं। रजिस्ट्रार को केवल पते के प्रमाण और सदस्यों की सहमति की आवश्यकता होती है।</li>
+                                <li><strong>GNIDA की भूमिका:</strong> आबादी कॉलोनियों में विकास प्राधिकरण (GNIDA) सीधे तौर पर रखरखाव नहीं देखता है, इसलिए RWA का होना बहुत जरूरी है ताकि आप सामूहिक रूप से सड़कों, सीवर और पानी के लिए अथॉरिटी पर दबाव बना सकें।</li>
+                                <li><strong>भूमि का स्वामित्व:</strong> RWA पंजीकरण भूमि के स्वामित्व (Title) का प्रमाण नहीं है, यह केवल कॉलोनी के कल्याण और प्रबंधन के लिए एक संस्था है।</li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h3 class="text-lg font-bold text-emerald-700 mb-2">पंजीकरण के बाद की जिम्मेदारियाँ</h3>
+                            <ul class="space-y-2 text-stone-700 text-sm">
+                                <li class="flex items-start"><span class="mr-2 text-emerald-600">✓</span> RWA के नाम पर बैंक खाता खोलना।</li>
+                                <li class="flex items-start"><span class="mr-2 text-emerald-600">✓</span> संस्था का पैन (PAN) कार्ड बनवाना।</li>
+                                <li class="flex items-start"><span class="mr-2 text-emerald-600">✓</span> हर साल वार्षिक आम बैठक (AGM) का आयोजन।</li>
+                                <li class="flex items-start"><span class="mr-2 text-emerald-600">✓</span> रजिस्ट्रार कार्यालय में हर साल गवर्निंग बॉडी की लिस्ट जमा करना (नवीनीकरण के लिए अनिवार्य)।</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="md:col-span-1 space-y-6">
+                    <div class="bg-teal-900 text-white rounded-xl shadow-md p-6">
+                        <h3 class="text-lg font-bold mb-4">संबंधित विभाग</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <h4 class="font-bold text-emerald-300 text-sm">रजिस्ट्रार कार्यालय</h4>
+                                <p class="text-xs text-teal-100">डिप्टी रजिस्ट्रार, फर्म, सोसाइटी एवं चिट्स (मेरठ/नोएडा)।</p>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-emerald-300 text-sm">स्थानीय प्राधिकरण</h4>
+                                <p class="text-xs text-teal-100">ग्रेटर नोएडा औद्योगिक विकास प्राधिकरण (GNIDA)।</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
+                        <h3 class="text-lg font-bold text-red-700 mb-3">⚠️ सामान्य गलतियाँ</h3>
+                        <ul class="text-xs text-stone-600 space-y-3">
+                            <li>❌ <strong>रक्त संबंध:</strong> कार्यकारिणी में एक ही परिवार के सदस्य नहीं होने चाहिए।</li>
+                            <li>❌ <strong>फंड का निजी उपयोग:</strong> मेंटेनेंस शुल्क हमेशा RWA के बैंक खाते में ही लें।</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: TOOLS -->
+        <section id="tools-view" class="view-section hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
+                    <h2 class="text-xl font-bold text-teal-800 mb-4">📋 तैयारी चेकलिस्ट</h2>
+                    <div id="progress-text" class="text-sm font-bold text-emerald-600 mb-2">0% पूर्ण</div>
+                    <div class="w-full bg-stone-200 rounded-full h-2.5 mb-6">
+                        <div id="progress-bar" class="bg-emerald-600 h-2.5 rounded-full" style="width: 0%"></div>
+                    </div>
+                    <div class="space-y-3" id="checklist-container"></div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6 flex flex-col">
+                    <h2 class="text-xl font-bold text-teal-800 mb-4">📱 व्हाट्सएप मैसेज जेनरेटर</h2>
+                    <div class="bg-emerald-50 border border-emerald-100 rounded-lg p-4 flex-grow mb-4 font-sans text-sm text-stone-800 whitespace-pre-wrap" id="whatsapp-preview" contenteditable="true">
+📢 *RWA गठन सूचना: रोजा जलालपुर*
+
+नमस्ते पड़ोसियों,
+
+हम अपनी कॉलोनी के विकास और सुरक्षा के लिए एक कानूनी "रेजिडेंट वेलफेयर एसोसिएशन" (RWA) बनाने की प्रक्रिया शुरू कर रहे हैं। इससे हमें GNIDA और अन्य विभागों में अपनी बात रखने में मजबूती मिलेगी।
+
+*वर्तमान स्थिति:*
+✅ कोर टीम का चयन
+📝 उप-नियम (Bye-laws) तैयार हो रहे हैं
+📅 अगली मीटिंग: [तारीख/समय दर्ज करें]
+
+हमें संस्थापक सदस्य के रूप में 7+ ऐसे मकान मालिकों की जरूरत है जिनके पास अपनी रजिस्ट्री की कॉपी हो।
+
+आइए मिलकर अपनी कॉलोनी को बेहतर बनाएं! 🏘️
+                    </div>
+                    <button onclick="app.copyToClipboard()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded transition">
+                        मैसेज कॉपी करें
+                    </button>
+                    <p id="copy-feedback" class="text-center text-sm text-emerald-600 mt-2 opacity-0 transition">कॉपी हो गया!</p>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-stone-100 border-t border-stone-200 py-8 mt-auto">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <p class="text-stone-500 text-sm italic">"एकजुट समाज, समृद्ध समाज"</p>
+        </div>
+    </footer>
+
+    <script>
+        const app = {
+            state: {
+                checklist: [
+                    { id: 1, text: "7 संस्थापक सदस्य (मकान मालिक)", checked: false },
+                    { id: 2, text: "रजिस्ट्री / सेल डीड की प्रतियां", checked: false },
+                    { id: 3, text: "आधार और पैन कार्ड (7 सदस्यों के)", checked: false },
+                    { id: 4, text: "संस्था का ज्ञापन (MoA) ड्राफ्ट", checked: false },
+                    { id: 5, text: "उप-नियम (Bye-laws) ड्राफ्ट", checked: false },
+                    { id: 6, text: "कार्यालय का पता प्रमाण (बिजली बिल)", checked: false },
+                    { id: 7, text: "शपथ पत्र (Affidavits)", checked: false }
+                ]
+            },
+
+            navigate: (id) => {
+                document.querySelectorAll('.view-section').forEach(v => v.classList.add('hidden'));
+                document.getElementById(`${id}-view`).classList.remove('hidden');
+                document.getElementById('mobile-menu').classList.add('hidden');
+                window.scrollTo(0,0);
+            },
+
+            toggleMobileMenu: () => document.getElementById('mobile-menu').classList.toggle('hidden'),
+
+            renderRoadmap: () => {
+                const steps = [
+                    { title: "1. कोर कमेटी का गठन", icon: "👥", desc: "कम से कम 7 सदस्य चुनें जो आपसी संबंधी न हों।", detail: "अध्यक्ष, सचिव और कोषाध्यक्ष जैसे पदों का चयन करें। सभी के पास रजिस्ट्री होनी चाहिए।" },
+                    { title: "2. संविधान तैयार करना", icon: "📜", desc: "MoA और उप-नियम तैयार करें।", detail: "इसमें RWA के उद्देश्य, चुनाव प्रक्रिया और मेंटेनेंस शुल्क के नियम लिखे जाते हैं।" },
+                    { title: "3. दस्तावेज़ीकरण", icon: "📂", desc: "नोटरी और शपथ पत्र तैयार करें।", detail: "रु 10/100 के स्टैम्प पेपर पर शपथ पत्र लगता है कि सदस्यों पर कोई कानूनी केस नहीं है।" },
+                    { title: "4. ऑनलाइन/ऑफलाइन फाइलिंग", icon: "🏢", desc: "रजिस्ट्रार कार्यालय में आवेदन जमा करें।", detail: "यूपी निवेश मित्र पोर्टल के जरिए आवेदन करें। सरकारी फीस लगभग रु 1000-2000 होती है।" },
+                    { title: "5. संचालन शुरू करना", icon: "✅", desc: "बैंक खाता और पैन कार्ड।", detail: "सर्टिफिकेट मिलने के बाद RWA के नाम से खाता खुलवाएं और GNIDA को सूचित करें।" }
+                ];
+                document.getElementById('roadmap-container').innerHTML = steps.map((s, i) => `
+                    <div class="relative pl-8 pb-8 ${i === 4 ? '' : 'step-connector'}">
+                        <div class="absolute left-0 top-0 bg-teal-100 text-teal-800 w-8 h-8 rounded-full flex items-center justify-center font-bold border-2 border-teal-500 z-10">${i+1}</div>
+                        <div class="bg-white p-4 rounded-lg border border-stone-200 interactive-card cursor-pointer" onclick="app.toggleStep(this)">
+                            <div class="flex justify-between items-center">
+                                <h3 class="text-md font-bold text-teal-900">${s.icon} ${s.title}</h3>
+                                <span>⌄</span>
+                            </div>
+                            <p class="text-xs text-stone-600 mt-1">${s.desc}</p>
+                            <div class="hidden mt-3 text-xs text-stone-700 bg-stone-50 p-2 rounded border-t">${s.detail}</div>
+                        </div>
+                    </div>
+                `).join('');
+            },
+
+            toggleStep: (el) => {
+                const d = el.querySelector('div.hidden, div.block');
+                d.classList.toggle('hidden');
+                d.classList.toggle('block');
+            },
+
+            renderChecklist: () => {
+                document.getElementById('checklist-container').innerHTML = app.state.checklist.map(item => `
+                    <div class="flex items-center p-2 bg-stone-50 rounded border border-stone-200">
+                        <input type="checkbox" id="c-${item.id}" ${item.checked ? 'checked' : ''} onchange="app.updateCheck(${item.id})" class="w-4 h-4">
+                        <label for="c-${item.id}" class="ml-2 text-xs font-medium ${item.checked ? 'line-through text-stone-400' : ''}">${item.text}</label>
+                    </div>
+                `).join('');
+                app.updateProgress();
+            },
+
+            updateCheck: (id) => {
+                const i = app.state.checklist.find(x => x.id === id);
+                i.checked = !i.checked;
+                app.renderChecklist();
+            },
+
+            updateProgress: () => {
+                const p = Math.round((app.state.checklist.filter(x => x.checked).length / app.state.checklist.length) * 100);
+                document.getElementById('progress-bar').style.width = `${p}%`;
+                document.getElementById('progress-text').innerText = `${p}% पूर्ण`;
+            },
+
+            copyToClipboard: () => {
+                const text = document.getElementById('whatsapp-preview').innerText;
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                const f = document.getElementById('copy-feedback');
+                f.style.opacity = '1';
+                setTimeout(() => f.style.opacity = '0', 2000);
+            },
+
+            initCharts: () => {
+                new Chart(document.getElementById('costChart'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['सरकारी शुल्क', 'स्टैम्प और नोटरी', 'कानूनी परामर्श (Optional)', 'विविध'],
+                        datasets: [{ data: [1500, 3000, 10000, 2000], backgroundColor: ['#0d9488', '#14b8a6', '#f59e0b', '#78716c'], borderWidth: 0 }]
+                    },
+                    options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } } }
+                });
+
+                new Chart(document.getElementById('timeChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['तैयारी', 'दस्तावेज़ीकरण', 'सरकारी प्रक्रिया', 'खाता संचालन'],
+                        datasets: [{ label: 'दिन', data: [15, 10, 45, 10], backgroundColor: '#0f766e' }]
+                    },
+                    options: { indexAxis: 'y', maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, ticks: { font: { size: 10 } } } } }
+                });
+            },
+
+            init: () => {
+                app.renderRoadmap();
+                app.renderChecklist();
+                app.initCharts();
+            }
+        };
+        document.addEventListener('DOMContentLoaded', app.init);
+    </script>
+</body>
+</html>
