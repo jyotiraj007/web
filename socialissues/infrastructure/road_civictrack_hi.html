@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>रोज़ा जलालपुर सड़क परियोजना डैशबोर्ड</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chosen Palette: Slate & Blue (Civic/Trust) -->
+    <!-- Application Structure Plan: 
+         1. Header: परियोजना की पहचान।
+         2. Executive Summary: मुख्य स्थिति और आंकड़े।
+         3. Project Details Grid: बजट (पाय चार्ट) और समय-रेखा (बार चार्ट) का विश्लेषण।
+         4. Status Timeline: परियोजना के चरणों का इंटरैक्टिव वर्टिकल ट्रैकर।
+         5. Action Center: नागरिकों के लिए संपर्क और शिकायत केंद्र।
+         WHY: यह संरचना उपयोगकर्ता को 'क्या हो रहा है?' से 'मैं क्या कर सकता हूँ?' की ओर ले जाती है।
+    -->
+    <!-- Visualization & Content Choices:
+         - बजट विश्लेषण -> लक्ष्य: सूचित करना -> डोनट चार्ट -> सड़क बनाम जल निकासी बजट।
+         - प्रगति ट्रैकिंग -> लक्ष्य: तुलना -> बार चार्ट -> नियोजित बनाम वास्तविक प्रगति।
+         - स्थिति चरण -> लक्ष्य: परिवर्तन -> इंटरैक्टिव समय-रेखा।
+         - संपर्क कार्ड -> लक्ष्य: कार्रवाई -> ग्रिड लेआउट और कॉपी बटन।
+         - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+    -->
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@300;400;600;700&display=swap');
+        
+        body {
+            font-family: 'Noto Sans Devanagari', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            height: 300px;
+            margin: 0 auto;
+        }
+
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 24px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: #e2e8f0;
+            z-index: 0;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- नेविगेशन / हेडर -->
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <i class="fa-solid fa-road text-blue-600 text-2xl mr-3"></i>
+                    <div>
+                        <h1 class="text-xl font-bold text-slate-900">विकास ट्रैक: रोज़ा जलालपुर</h1>
+                        <p class="text-xs text-slate-500">मारपत रोड बुनियादी ढांचा मॉनिटर</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800 border border-green-200">
+                        स्थिति: सक्रिय
+                    </span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- मुख्य सामग्री -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- अनुभाग 1: परियोजना अवलोकन -->
+        <section class="mb-10">
+            <div class="bg-white rounded-xl card-shadow overflow-hidden border border-slate-100">
+                <div class="p-6 md:p-8">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                        <div>
+                            <h2 class="text-2xl font-bold text-slate-800">परियोजना अवलोकन</h2>
+                            <p class="mt-2 text-slate-600 max-w-3xl">
+                                रोज़ा जलालपुर गाँव में <strong>मारपत रोड (लिंक रोड)</strong> के सुदृढ़ीकरण और जल निकासी व्यवस्था की विस्तृत ट्रैकिंग। यह परियोजना <strong>ग्रेटर नोएडा औद्योगिक विकास प्राधिकरण (GNIDA)</strong> के अंतर्गत आती है।
+                            </p>
+                        </div>
+                        <div class="mt-4 md:mt-0 flex flex-col items-end">
+                            <span class="text-sm text-slate-500">परियोजना आईडी</span>
+                            <span class="text-lg font-mono font-bold text-blue-600">GNIDA/WC-3/2024-25/082</span>
+                        </div>
+                    </div>
+
+                    <!-- मुख्य आंकड़े -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                            <span class="text-sm font-medium text-slate-500">कुल बजट</span>
+                            <div class="mt-2 text-2xl font-bold text-slate-900">₹ 1.85 करोड़</div>
+                            <div class="text-xs text-green-600 mt-1"><i class="fa-solid fa-check-circle mr-1"></i> स्वीकृत</div>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                            <span class="text-sm font-medium text-slate-500">समय-सीमा</span>
+                            <div class="mt-2 text-2xl font-bold text-slate-900">6 महीने</div>
+                            <div class="text-xs text-slate-500 mt-1">लक्ष्य: मई 2025</div>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                            <span class="text-sm font-medium text-slate-500">प्राधिकरण</span>
+                            <div class="mt-2 text-xl font-bold text-slate-900">GNIDA</div>
+                            <div class="text-xs text-slate-500 mt-1">वर्क सर्किल 3</div>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                            <span class="text-sm font-medium text-slate-500">वर्तमान चरण</span>
+                            <div class="mt-2 text-xl font-bold text-slate-900">निर्माण कार्य</div>
+                            <div class="text-xs text-orange-600 mt-1">नाली निर्माण जारी</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- अनुभाग 2: वित्तीय और प्रगति विश्लेषण -->
+        <section class="mb-10 grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- बजट आवंटन -->
+            <div class="bg-white rounded-xl card-shadow border border-slate-100 p-6">
+                <h3 class="text-lg font-bold text-slate-800 mb-4">बजट आवंटन</h3>
+                <div class="chart-container">
+                    <canvas id="budgetChart"></canvas>
+                </div>
+                <div class="mt-4 grid grid-cols-2 gap-4 text-sm">
+                    <div class="flex items-center">
+                        <span class="w-3 h-3 rounded-full bg-blue-600 mr-2"></span>
+                        <span>सड़क निर्माण (60%)</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="w-3 h-3 rounded-full bg-cyan-400 mr-2"></span>
+                        <span>जल निकासी (25%)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- प्रगति ट्रैकर -->
+            <div class="bg-white rounded-xl card-shadow border border-slate-100 p-6">
+                <h3 class="text-lg font-bold text-slate-800 mb-4">प्रगति ट्रैकर (%)</h3>
+                <div class="chart-container">
+                    <canvas id="progressChart"></canvas>
+                </div>
+                <div class="mt-4 bg-blue-50 border-l-4 border-blue-400 p-3 text-sm text-blue-800">
+                    <i class="fa-solid fa-info-circle mr-2"></i> वर्तमान में निर्माण कार्य निर्धारित गति से थोड़ा पीछे है।
+                </div>
+            </div>
+        </section>
+
+        <!-- अनुभाग 3: टाइमलाइन -->
+        <section class="mb-10">
+            <h3 class="text-xl font-bold text-slate-800 mb-6">परियोजना की स्थिति</h3>
+            <div class="bg-white rounded-xl card-shadow border border-slate-100 p-6 md:p-8 relative">
+                <div class="timeline-line"></div>
+                <div class="space-y-8" id="timeline-container">
+                    <!-- डेटा JS द्वारा भरा जाएगा -->
+                </div>
+            </div>
+        </section>
+
+        <!-- अनुभाग 4: संपर्क और शिकायत केंद्र -->
+        <section id="contact-section" class="mb-10">
+            <h3 class="text-xl font-bold text-slate-800 mb-6">शिकायत एवं संपर्क केंद्र</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                <!-- कार्ड 1 -->
+                <div class="bg-white rounded-lg border border-slate-200 p-5 group hover:border-blue-400 transition-all">
+                    <div class="flex items-center mb-3">
+                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                            <i class="fa-solid fa-user-tie"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h4 class="font-bold text-slate-800">सीनियर मैनेजर</h4>
+                            <p class="text-xs text-slate-500">वर्क सर्किल 3 (प्रोजेक्ट्स)</p>
+                        </div>
+                    </div>
+                    <p class="text-sm text-slate-600 mb-2">ग्रेटर नोएडा प्राधिकरण कार्यालय, नॉलेज पार्क-IV</p>
+                    <div class="flex items-center text-sm">
+                        <span id="email-1">projects@gnida.in</span>
+                        <button onclick="copyText('email-1')" class="ml-auto text-blue-500 font-bold">कॉपी</button>
+                    </div>
+                </div>
+
+                <!-- कार्ड 2 -->
+                <div class="bg-white rounded-lg border border-slate-200 p-5 group hover:border-blue-400 transition-all">
+                    <div class="flex items-center mb-3">
+                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                            <i class="fa-solid fa-mobile-screen"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h4 class="font-bold text-slate-800">ऑनलाइन शिकायत</h4>
+                            <p class="text-xs text-slate-500">जनसुनवाई / मित्र ऐप</p>
+                        </div>
+                    </div>
+                    <a href="https://jansunwai.up.nic.in/" target="_blank" class="block w-full text-center bg-slate-100 py-2 rounded text-sm font-bold">जनसुनवाई पोर्टल</a>
+                </div>
+
+                <!-- कार्ड 3 -->
+                <div class="bg-white rounded-lg border border-slate-200 p-5 group hover:border-blue-400 transition-all">
+                    <div class="flex items-center mb-3">
+                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                            <i class="fa-solid fa-file-invoice"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h4 class="font-bold text-slate-800">RTI जानकारी</h4>
+                            <p class="text-xs text-slate-500">सूचना का अधिकार</p>
+                        </div>
+                    </div>
+                    <p class="text-xs mb-2">सामग्री की गुणवत्ता जानने के लिए RTI का प्रयोग करें।</p>
+                    <div class="flex items-center text-sm">
+                        <span id="email-rti">rti@gnida.in</span>
+                        <button onclick="copyText('email-rti')" class="ml-auto text-blue-500 font-bold">कॉपी</button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- टोस्ट नोटिफिकेशन -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-800 text-white px-4 py-2 rounded shadow-lg transform translate-y-20 opacity-0 transition-all duration-300">
+        कॉपी कर लिया गया!
+    </div>
+
+    <script>
+        const projectData = {
+            budget: [1.11, 0.46, 0.18, 0.10],
+            budgetLabels: ['सड़क निर्माण', 'जल निकासी', 'सिविल कार्य', 'आकस्मिक'],
+            progressPlanned: [0, 20, 45, 70, 90, 100],
+            progressActual: [0, 15, 30, 42, null, null],
+            months: ['नवं 24', 'दिसं 24', 'जन 25', 'फर 25', 'मार्च 25', 'अप्रैल 25'],
+            timeline: [
+                { date: "15 सितं 2024", title: "परियोजना स्वीकृति", desc: "1.85 करोड़ का बजट स्वीकृत किया गया।", status: "completed", icon: "fa-check" },
+                { date: "10 अक्टू 2024", title: "निविदा (Tender)", desc: "ठेकेदार का चयन पूरा हुआ।", status: "completed", icon: "fa-file-signature" },
+                { date: "15 नवं 2024", title: "कार्य प्रारंभ", desc: "मशीनरी और लेबर की तैनाती की गई।", status: "completed", icon: "fa-truck" },
+                { date: "वर्तमान", title: "नाली निर्माण", desc: "रास्ते के दोनों ओर नालियों का निर्माण किया जा रहा है।", status: "active", icon: "fa-digging" },
+                { date: "मार्च 2025", title: "सड़क की लेयर", desc: "कोलतार बिछाने का कार्य प्रस्तावित है।", status: "pending", icon: "fa-road" }
+            ]
+        };
+
+        window.onload = function() {
+            renderCharts();
+            renderTimeline();
+        };
+
+        function renderCharts() {
+            // Budget Chart
+            new Chart(document.getElementById('budgetChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: projectData.budgetLabels,
+                    datasets: [{
+                        data: projectData.budget,
+                        backgroundColor: ['#2563eb', '#22d3ee', '#cbd5e1', '#fb923c'],
+                        borderWidth: 0
+                    }]
+                },
+                options: { maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+
+            // Progress Chart
+            new Chart(document.getElementById('progressChart'), {
+                type: 'bar',
+                data: {
+                    labels: projectData.months,
+                    datasets: [
+                        { label: 'नियोजित (%)', data: projectData.progressPlanned, backgroundColor: '#e2e8f0' },
+                        { label: 'वास्तविक (%)', data: projectData.progressActual, backgroundColor: '#3b82f6' }
+                    ]
+                },
+                options: { maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100 } } }
+            });
+        }
+
+        function renderTimeline() {
+            const container = document.getElementById('timeline-container');
+            projectData.timeline.forEach(event => {
+                let color = event.status === 'completed' ? 'bg-green-100 text-green-600' : (event.status === 'active' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-400');
+                let border = event.status === 'active' ? 'border-blue-400 shadow-md' : 'border-slate-100';
+                
+                const html = `
+                    <div class="relative pl-12">
+                        <div class="absolute left-0 top-0 w-12 h-12 rounded-full flex items-center justify-center ${color} z-10 border-4 border-white">
+                            <i class="fa-solid ${event.icon}"></i>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg border ${border}">
+                            <div class="flex justify-between items-center mb-1">
+                                <h4 class="font-bold text-slate-800">${event.title}</h4>
+                                <span class="text-xs bg-slate-100 px-2 py-1 rounded font-mono">${event.date}</span>
+                            </div>
+                            <p class="text-sm text-slate-600">${event.desc}</p>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += html;
+            });
+        }
+
+        function copyText(id) {
+            const text = document.getElementById(id).innerText;
+            navigator.clipboard.writeText(text);
+            const toast = document.getElementById('toast');
+            toast.classList.remove('opacity-0', 'translate-y-20');
+            setTimeout(() => toast.classList.add('opacity-0', 'translate-y-20'), 3000);
+        }
+    </script>
+</body>
+</html>
