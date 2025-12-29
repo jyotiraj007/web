@@ -42,12 +42,9 @@ Pages addressing community infrastructure issues:
 ### Diffusion Models Learning
 - [Diffusion Models: Learn by Doing](diffusionmodels/Diffusion%20Models_%20Learn%20by%20Doing%20-%20Google%20Docs.pdf) - Comprehensive learning guide
 
-### Community Documentation
-- [Road Repair Complaint Guidance](socialissues/rozajalapurroad/Road%20Repair%20Complaint%20Guidance%20-%20Google%20Docs.pdf) - Guidance for filing road repair complaints
-- [Greater Noida West Infrastructure Development](socialissues/rozajalapurroad/%E0%A4%97%E0%A5%8D%E0%A4%B0%E0%A5%87%E0%A4%9F%E0%A4%B0%20%E0%A4%A8%E0%A5%8B%E0%A4%8F%E0%A4%A1%E0%A4%BE%20%E0%A4%AA%E0%A4%B6%E0%A5%8D%E0%A4%9A%E0%A4%BF%E0%A4%AE%20%E0%A4%AE%E0%A5%87%E0%A4%82%20%E0%A4%B8%E0%A4%A1%E0%A4%BC%E0%A4%95%20%E0%A4%AE%E0%A4%B0%E0%A4%AE%E0%A5%8D%E0%A4%AE%E0%A4%A4%20%E0%A4%94%E0%A4%B0%20%E0%A4%AC%E0%A5%81%E0%A4%A8%E0%A4%BF%E0%A4%AF%E0%A4%BE%E0%A4%A6%E0%A5%80%20%E0%A4%8A%E0%A4%BE%E0%A4%9A%E0%A4%BE%20%E0%A4%B5%E0%A4%BF%E0%A4%95%E0%A4%BE%E0%A4%B8_%20%E0%A4%B0%E0%A5%8B%E0%A4%9C%E0%A4%BE%20%E0%A4%9C%E0%A4%B2%E0%A4%BE%E0%A4%B2%E0%A4%AA%E0%A5%81%E0%A4%B0%20%E0%A4%94%E0%A4%B0%20%E0%A4%B8%E0%A4%A6%E0%A5%81%E0%A4%B2%E0%A4%B2%E0%A4%BE%E0%A4%AA%E0%A5%81%E0%A4%B0%20%E0%A4%95%E0%A5%87%20%E0%A4%A8%E0%A4%BE.pdf) - Infrastructure development documentation (Hindi)
-
 ### RWA Doc
-- [RWA Planning](https://jyotiraj007.github.io/web/socialissues/rwa/rwa_hi.html)
+- [RWA Planning Hindi](https://jyotiraj007.github.io/web/socialissues/rwa/rwa_hi.html)
+- [RWA Planning English](https://jyotiraj007.github.io/web/socialissues/rwa/rwa_en.html)
 
 ## 🚀 How to Use
 
@@ -72,4 +69,4 @@ Feel free to contribute by:
 
 ---
 
-*Last updated: December 2024*
+*Last updated: December 2025*
