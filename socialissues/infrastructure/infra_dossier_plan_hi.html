@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>रोज़ा जलालपुर नागरिक कार्रवाई डैशबोर्ड</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans Devanagari', sans-serif; background-color: #fefaf3; color: #374151; }
+        .chart-container { 
+            position: relative; 
+            width: 100%; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            height: 300px; 
+            max-height: 400px; 
+        } 
+        @media (min-width: 768px) { .chart-container { height: 350px; } }
+        .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); }
+        .nav-active { border-bottom: 3px solid #b45309; color: #b45309; font-weight: 700; }
+        .step-line { position: absolute; left: 1.25rem; top: 2.5rem; bottom: -1rem; width: 2px; background-color: #d1d5db; z-index: 0; }
+        .last-step .step-line { display: none; }
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+    <!-- Chosen Palette: 'Traditional Civic' - Amber (#b45309), Cream (#fefaf3), Slate Gray (#374151). -->
+    <!-- Application Structure Plan:
+        1. होम (Home): मुख्य सारांश और मिशन का विवरण।
+        2. जांच चेकलिस्ट (Tracker): निवासियों के लिए डेटा एकत्र करने का फ्रेमवर्क।
+        3. 30-दिवसीय योजना (Timeline): Chart.js का उपयोग करके समयसीमा का चित्रण।
+        4. शिकायत प्रक्रिया (Escalation): प्राधिकरण से लेकर लोकायुक्त तक की सीढ़ी।
+        5. टूलकिट (Templates): RTI और पत्रों के तैयार मसौदे।
+    -->
+    <!-- Visualization & Content Choices:
+        - Chart.js: 30-दिवसीय कार्य योजना को क्षैतिज बार चार्ट (Gantt style) के रूप में दिखाया गया है।
+        - इंटरएक्टिव स्टेपर: शिकायत के चरणों को स्पष्ट करने के लिए।
+        - कॉपी-टू-क्लिपबोर्ड: सर्च क्वेरी और टेम्पलेट्स के लिए।
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-orange-100 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex items-center">
+                    <div class="h-10 w-10 bg-amber-700 rounded-lg flex items-center justify-center text-white font-bold mr-3 shadow-md">RJ</div>
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-900 leading-tight">रोज़ा जलालपुर</h1>
+                        <p class="text-xs text-amber-700 font-medium">बुनियादी ढांचा निगरानी एवं नागरिक गाइड</p>
+                    </div>
+                </div>
+                <div class="hidden lg:flex space-x-6">
+                    <button onclick="nav('overview')" id="nav-overview" class="nav-btn nav-active py-2 px-1 text-sm text-gray-600 hover:text-amber-700 transition">मुख्य मिशन</button>
+                    <button onclick="nav('tracker')" id="nav-tracker" class="nav-btn py-2 px-1 text-sm text-gray-600 hover:text-amber-700 transition">जांच चेकलिस्ट</button>
+                    <button onclick="nav('timeline')" id="nav-timeline" class="nav-btn py-2 px-1 text-sm text-gray-600 hover:text-amber-700 transition">30-दिवसीय योजना</button>
+                    <button onclick="nav('escalation')" id="nav-escalation" class="nav-btn py-2 px-1 text-sm text-gray-600 hover:text-amber-700 transition">शिकायत सीढ़ी</button>
+                    <button onclick="nav('toolkit')" id="nav-toolkit" class="nav-btn py-2 px-1 text-sm text-gray-600 hover:text-amber-700 transition">टूल्स एवं ड्राफ्ट</button>
+                </div>
+                <button class="lg:hidden text-amber-700 text-2xl" onclick="toggleMobileMenu()">☰</button>
+            </div>
+        </div>
+        <!-- Mobile Nav -->
+        <div id="mobile-menu" class="hidden lg:hidden bg-white border-t border-gray-100 shadow-lg">
+            <div class="px-4 py-4 space-y-3">
+                <button onclick="nav('overview')" class="block w-full text-left font-medium text-gray-700">मुख्य मिशन</button>
+                <button onclick="nav('tracker')" class="block w-full text-left font-medium text-gray-700">जांच चेकलिस्ट</button>
+                <button onclick="nav('timeline')" class="block w-full text-left font-medium text-gray-700">30-दिवसीय योजना</button>
+                <button onclick="nav('escalation')" class="block w-full text-left font-medium text-gray-700">शिकायत सीढ़ी</button>
+                <button onclick="nav('toolkit')" class="block w-full text-left font-medium text-gray-700">टूल्स एवं ड्राफ्ट</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+
+        <!-- VIEW 1: OVERVIEW (होम) -->
+        <section id="overview" class="fade-in">
+            <div class="mb-10 text-center max-w-4xl mx-auto">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4 italic">बुनियादी ढांचा अनुसंधान डोजियर</h2>
+                <p class="text-gray-600 text-lg leading-relaxed">
+                    यह डैशबोर्ड <span class="text-amber-700 font-bold">रोज़ा जलालपुर — मारीपत रोड, ग्रेटर नोएडा वेस्ट</span> में नागरिक विकास कार्यों, 
+                    बजट और शिकायत मार्गों को समझने के लिए बनाया गया है। यह निवासियों को उनके क्षेत्र के विकास पर प्रभावी नियंत्रण रखने में मदद करता है।
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <div class="bg-white p-6 rounded-xl card-shadow border-l-4 border-amber-600">
+                    <h3 class="text-lg font-bold text-amber-900 mb-2">📍 क्षेत्र/अधिकार</h3>
+                    <p class="text-sm text-gray-600 leading-normal">ग्रेटर नोएडा प्राधिकरण (GNIDA) और गौतम बुद्ध नगर जिला प्रशासन।</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl card-shadow border-l-4 border-amber-600">
+                    <h3 class="text-lg font-bold text-amber-900 mb-2">🎯 मुख्य उद्देश्य</h3>
+                    <p class="text-sm text-gray-600 leading-normal">आधिकारिक योजनाओं, बजट आवंटन बनाम खर्च और समयसीमा का मानचित्रण करना।</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl card-shadow border-l-4 border-amber-600">
+                    <h3 class="text-lg font-bold text-amber-900 mb-2">⚠️ नागरिक शक्ति</h3>
+                    <p class="text-sm text-gray-600 leading-normal">देरी या घटिया काम के खिलाफ साक्ष्य आधारित शिकायत और कानूनी कार्रवाई का मार्ग।</p>
+                </div>
+            </div>
+
+            <div class="bg-amber-50 rounded-2xl p-8 border border-amber-100">
+                <h3 class="text-xl font-bold text-amber-900 mb-6 text-center">विकास के मुख्य क्षेत्र</h3>
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-white p-5 rounded-lg shadow-sm text-center transform hover:scale-105 transition">
+                        <span class="text-3xl mb-3 block">🛣️</span>
+                        <span class="font-bold text-gray-800 text-sm">सड़कें और फुटपाथ</span>
+                    </div>
+                    <div class="bg-white p-5 rounded-lg shadow-sm text-center transform hover:scale-105 transition">
+                        <span class="text-3xl mb-3 block">💧</span>
+                        <span class="font-bold text-gray-800 text-sm">जल आपूर्ति और सीवरेज</span>
+                    </div>
+                    <div class="bg-white p-5 rounded-lg shadow-sm text-center transform hover:scale-105 transition">
+                        <span class="text-3xl mb-3 block">💡</span>
+                        <span class="font-bold text-gray-800 text-sm">स्ट्रीट लाइटिंग</span>
+                    </div>
+                    <div class="bg-white p-5 rounded-lg shadow-sm text-center transform hover:scale-105 transition">
+                        <span class="text-3xl mb-3 block">🚇</span>
+                        <span class="font-bold text-gray-800 text-sm">मेट्रो और बस कनेक्टिविटी</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 2: CHECKLIST (जांच) -->
+        <section id="tracker" class="hidden fade-in">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-gray-900">परियोजना जांच चेकलिस्ट</h2>
+                <p class="text-gray-600 mt-2">किसी भी सार्वजनिक कार्य की निगरानी करते समय इन 4 प्रमुख बिन्दुओं पर डेटा अवश्य एकत्र करें।</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white rounded-xl card-shadow overflow-hidden border border-gray-100">
+                    <div class="bg-amber-800 px-6 py-4">
+                        <h3 class="text-white font-bold">अनिवार्य डेटा फील्ड्स</h3>
+                    </div>
+                    <div class="p-6 space-y-6">
+                        <div class="flex items-start">
+                            <div class="bg-amber-100 text-amber-800 h-8 w-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">1</div>
+                            <div class="ml-4">
+                                <h4 class="font-bold text-gray-900">परियोजना की पहचान</h4>
+                                <p class="text-sm text-gray-600">आधिकारिक नाम और विभाग (जैसे: GNIDA इंजीनियरिंग, UP PWD)।</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="bg-amber-100 text-amber-800 h-8 w-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">2</div>
+                            <div class="ml-4">
+                                <h4 class="font-bold text-gray-900">बजट विवरण</h4>
+                                <p class="text-sm text-gray-600">कुल स्वीकृत राशि बनाम अब तक का वास्तविक खर्च। (RTI से प्राप्त करें)।</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="bg-amber-100 text-amber-800 h-8 w-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">3</div>
+                            <div class="ml-4">
+                                <h4 class="font-bold text-gray-900">समय सीमा</h4>
+                                <p class="text-sm text-gray-600">काम शुरू होने की तारीख और अनुबंध के अनुसार पूरा होने की अंतिम तिथि।</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="bg-amber-100 text-amber-800 h-8 w-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">4</div>
+                            <div class="ml-4">
+                                <h4 class="font-bold text-gray-900">सत्यापन स्रोत</h4>
+                                <p class="text-sm text-gray-600">टेंडर नोटिस की प्रति या RTI के जवाब की संदर्भ संख्या।</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="bg-white p-6 rounded-xl card-shadow border-t-4 border-amber-700">
+                        <h3 class="font-bold text-lg mb-4 italic">क्षेत्रवार निगरानी गाइड</h3>
+                        <div class="space-y-3">
+                            <details class="group bg-gray-50 rounded-lg p-3 border border-gray-200">
+                                <summary class="font-bold cursor-pointer list-none flex justify-between items-center text-gray-800">
+                                    <span>सड़क परियोजनाएं</span>
+                                    <span class="group-open:rotate-180 transition">▼</span>
+                                </summary>
+                                <p class="mt-2 text-sm text-gray-600">मारीपत रोड पर सड़कों की चौड़ाई और ड्रेनेज के काम पर ध्यान दें। GNIDA के 'Public Notices' सेक्शन में टेंडर खोजें।</p>
+                            </details>
+                            <details class="group bg-gray-50 rounded-lg p-3 border border-gray-200">
+                                <summary class="font-bold cursor-pointer list-none flex justify-between items-center text-gray-800">
+                                    <span>परिवहन और मेट्रो</span>
+                                    <span class="group-open:rotate-180 transition">▼</span>
+                                </summary>
+                                <p class="mt-2 text-sm text-gray-600">NMRC के मेट्रो विस्तार (Phase 2) और बस शेल्टर के निर्माण कार्य का विवरण ट्रैक करें।</p>
+                            </details>
+                            <details class="group bg-gray-50 rounded-lg p-3 border border-gray-200">
+                                <summary class="font-bold cursor-pointer list-none flex justify-between items-center text-gray-800">
+                                    <span>स्ट्रीट लाइट/सीवर</span>
+                                    <span class="group-open:rotate-180 transition">▼</span>
+                                </summary>
+                                <p class="mt-2 text-sm text-gray-600">LED लाइटों के रख-रखाव के वार्षिक अनुबंध और STP (सीवर ट्रीटमेंट प्लांट) की क्षमता विस्तार की जांच करें।</p>
+                            </details>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 3: TIMELINE (समयसीमा) -->
+        <section id="timeline" class="hidden fade-in">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-gray-900">30-दिवसीय नागरिक कार्य योजना</h2>
+                <p class="text-gray-600 mt-2">डेटा खोजने से लेकर आधिकारिक शिकायत दर्ज करने तक की एक व्यवस्थित समयसीमा।</p>
+            </div>
+
+            <div class="bg-white p-8 rounded-xl card-shadow mb-8 border border-gray-100">
+                <div class="chart-container">
+                    <canvas id="hindiActionChart"></canvas>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="p-5 bg-blue-50 border-l-4 border-blue-600 rounded">
+                    <h4 class="font-bold text-blue-900">दिन 1-7</h4>
+                    <p class="text-sm text-blue-800 italic">खोज और प्रारंभिक शिकायत (GNIDA Mitra/Jansunwai)</p>
+                </div>
+                <div class="p-5 bg-amber-50 border-l-4 border-amber-600 rounded">
+                    <h4 class="font-bold text-amber-900">दिन 8-22</h4>
+                    <p class="text-sm text-amber-800 italic">RTI दाखिल करना और डेटा सत्यापन की प्रतीक्षा</p>
+                </div>
+                <div class="p-5 bg-orange-50 border-l-4 border-orange-600 rounded">
+                    <h4 class="font-bold text-orange-900">दिन 23-27</h4>
+                    <p class="text-sm text-orange-800 italic">प्रथम अपील का मसौदा तैयार करना (यदि जवाब संतोषजनक न हो)</p>
+                </div>
+                <div class="p-5 bg-red-50 border-l-4 border-red-600 rounded">
+                    <h4 class="font-bold text-red-900">दिन 28-30</h4>
+                    <p class="text-sm text-red-800 italic">अंतिम विस्तार (DM/लोकायुक्त को लिखित शिकायत)</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 4: ESCALATION (सीढ़ी) -->
+        <section id="escalation" class="hidden fade-in">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-gray-900">शिकायत निवारण की सीढ़ी</h2>
+                <p class="text-gray-600 mt-2">यदि आपकी शिकायत का समाधान निर्धारित समय में नहीं होता है, तो इस पदानुक्रम का पालन करें।</p>
+            </div>
+
+            <div class="max-w-3xl mx-auto bg-white rounded-2xl card-shadow p-8 relative border border-gray-100">
+                
+                <!-- Step 1 -->
+                <div class="relative pl-14 pb-12">
+                    <div class="step-line"></div>
+                    <div class="absolute left-0 top-0 h-10 w-10 bg-amber-600 rounded-full flex items-center justify-center text-white font-bold z-10">१</div>
+                    <h3 class="text-lg font-bold text-gray-900">स्तर 1: डिजिटल शिकायत</h3>
+                    <p class="text-sm text-gray-600 mt-1">पोर्टल पर शिकायत दर्ज करें और 'Complaint ID' प्राप्त करें।</p>
+                    <div class="mt-3 flex space-x-2">
+                        <span class="bg-gray-100 px-2 py-1 text-xs rounded border border-gray-200">GNIDA Mitra App</span>
+                        <span class="bg-gray-100 px-2 py-1 text-xs rounded border border-gray-200">Jansunwai (UP Govt)</span>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="relative pl-14 pb-12">
+                    <div class="step-line"></div>
+                    <div class="absolute left-0 top-0 h-10 w-10 bg-amber-600 rounded-full flex items-center justify-center text-white font-bold z-10">२</div>
+                    <h3 class="text-lg font-bold text-gray-900">स्तर 2: सूचना का अधिकार (RTI)</h3>
+                    <p class="text-sm text-gray-600 mt-1">यदि काम रुका हुआ है, तो RTI द्वारा बजट और देरी का कारण पूछें।</p>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="relative pl-14 pb-12">
+                    <div class="step-line"></div>
+                    <div class="absolute left-0 top-0 h-10 w-10 bg-amber-600 rounded-full flex items-center justify-center text-white font-bold z-10">३</div>
+                    <h3 class="text-lg font-bold text-gray-900">स्तर 3: जिला मजिस्ट्रेट (DM)</h3>
+                    <p class="text-sm text-gray-600 mt-1">RTI जवाब और साक्ष्यों (तस्वीरों) के साथ DM को लिखित पत्र भेजें।</p>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="relative pl-14 last-step">
+                    <div class="absolute left-0 top-0 h-10 w-10 bg-red-700 rounded-full flex items-center justify-center text-white font-bold z-10">४</div>
+                    <h3 class="text-lg font-bold text-red-800">स्तर 4: लोकायुक्त / सतर्कता विभाग</h3>
+                    <p class="text-sm text-gray-600 mt-1">अंतिम प्रशासनिक उपाय - भ्रष्टाचार या घोर लापरवाही के मामले में।</p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- VIEW 5: TOOLKIT (टूलकिट) -->
+        <section id="toolkit" class="hidden fade-in">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-gray-900">टूल्स एवं ड्राफ्ट टेम्पलेट्स</h2>
+                <p class="text-gray-600 mt-2">आपकी शिकायतों और आरटीआई आवेदनों के लिए तैयार हिंदी मसौदे।</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                <!-- Search -->
+                <div class="bg-white p-6 rounded-xl card-shadow border border-gray-100">
+                    <h3 class="font-bold text-lg mb-4 flex items-center text-amber-900">
+                        <span class="mr-2">🔎</span> महत्वपूर्ण खोज शब्द (Google/Portal)
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center bg-gray-50 p-3 rounded border border-gray-200">
+                            <code class="text-xs font-mono text-amber-800">“GNIDA Roza Jalalpur public notice”</code>
+                            <button onclick="copyToClipboard('GNIDA Roza Jalalpur public notice')" class="text-xs bg-white border px-2 py-1 rounded hover:bg-gray-100">कॉपी</button>
+                        </div>
+                        <div class="flex justify-between items-center bg-gray-50 p-3 rounded border border-gray-200">
+                            <code class="text-xs font-mono text-amber-800">“Roza Jalalpur Maripat Road project”</code>
+                            <button onclick="copyToClipboard('Roza Jalalpur Maripat Road infrastructure project')" class="text-xs bg-white border px-2 py-1 rounded hover:bg-gray-100">कॉपी</button>
+                        </div>
+                        <div class="flex justify-between items-center bg-gray-50 p-3 rounded border border-gray-200">
+                            <code class="text-xs font-mono text-amber-800">“UP PWD projects Gautam Buddh Nagar”</code>
+                            <button onclick="copyToClipboard('UP PWD road projects Gautam Buddh Nagar')" class="text-xs bg-white border px-2 py-1 rounded hover:bg-gray-100">कॉपी</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Template Selector -->
+                <div class="bg-white p-6 rounded-xl card-shadow border border-gray-100">
+                    <h3 class="font-bold text-lg mb-4 flex items-center text-amber-900">
+                        <span class="mr-2">📝</span> पत्र एवं आवेदन के प्रारूप
+                    </h3>
+                    <div class="mb-4">
+                        <select id="hindiTemplateSelect" onchange="updateHindiTemplate()" class="w-full border border-gray-300 rounded p-2 text-sm">
+                            <option value="grievance">शिकायत पत्र (प्रारूप)</option>
+                            <option value="rti">RTI आवेदन (प्रारूप)</option>
+                            <option value="dm_escalation">DM को पत्र (प्रारूप)</option>
+                        </select>
+                    </div>
+                    <div class="relative">
+                        <textarea id="hindiTemplateText" class="w-full h-48 p-4 text-sm bg-gray-50 border border-gray-200 rounded font-serif leading-relaxed" readonly></textarea>
+                        <button onclick="copyHindiTemplate()" class="absolute top-2 right-2 bg-amber-700 text-white px-3 py-1 text-xs rounded shadow-sm hover:bg-amber-800">कॉपी करें</button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Important Links -->
+            <div class="mt-10 p-6 bg-amber-50 rounded-xl border border-amber-100">
+                <h3 class="font-bold text-amber-900 mb-3">महत्वपूर्ण लिंक</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+                    <a href="https://gnida.up.gov.in" target="_blank" class="text-amber-800 hover:underline">GNIDA आधिकारिक वेबसाइट ↗</a>
+                    <a href="https://jansunwai.up.nic.in" target="_blank" class="text-amber-800 hover:underline">जनसुनवाई पोर्टल (शिकायत) ↗</a>
+                    <a href="https://gbnagar.nic.in" target="_blank" class="text-amber-800 hover:underline">गौतम बुद्ध नगर जिला पोर्टल ↗</a>
+                    <a href="https://uppwd.gov.in" target="_blank" class="text-amber-800 hover:underline">UP PWD विभाग ↗</a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-10 mt-12">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-sm font-bold text-white">रोज़ा जलालपुर - बुनियादी ढांचा निगरानी ढांचा</p>
+            <p class="text-xs mt-3 leading-relaxed">अस्वीकरण: यह डैशबोर्ड केवल प्रक्रियात्मक मार्गदर्शन के लिए है। <br> वास्तविक जानकारी के लिए आधिकारिक सरकारी पोर्टल देखें।</p>
+            <div id="toast" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-2 rounded-full shadow-xl opacity-0 transition-opacity pointer-events-none">
+                कॉपी किया गया!
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Data & Logic
+        const hindiTemplates = {
+            grievance: `सेवा में,
+सक्षम अधिकारी (नाम/विभाग),
+ग्रेटर नोएडा विकास प्राधिकरण (GNIDA)
+
+विषय: रोज़ा जलालपुर/मारीपत रोड पर [समस्या का नाम] के संबंध में शिकायत।
+
+महोदय,
+मैं रोज़ा जलालपुर का निवासी हूँ। मैं आपका ध्यान [सड़क/सीवर/लाइट] की दयनीय स्थिति की ओर आकर्षित करना चाहता हूँ।
+
+इस क्षेत्र में [कार्य का विवरण] लंबे समय से अधूरा है, जिससे निवासियों को [समस्या बताएं] का सामना करना पड़ रहा है।
+
+अतः आपसे अनुरोध है कि:
+1. कार्य की वर्तमान स्थिति स्पष्ट करें।
+2. कार्य पूरा होने की संभावित तिथि बताएं।
+3. संबंधित इंजीनियर/ठेकेदार का नाम बताएं।
+
+सादर,
+[आपका नाम]
+[संपर्क नंबर]`,
+            rti: `सेवा में,
+लोक सूचना अधिकारी,
+ग्रेटर नोएडा औद्योगिक विकास प्राधिकरण (GNIDA)
+
+विषय: सूचना का अधिकार अधिनियम, 2005 के तहत आवेदन।
+
+महोदय,
+कृपया रोज़ा जलालपुर मारीपत रोड पर चल रहे [परियोजना का नाम] के संबंध में निम्नलिखित जानकारी प्रदान करें:
+
+1. उक्त परियोजना के लिए स्वीकृत कुल बजट की सत्यापित प्रति।
+2. कार्य आदेश (Work Order) की प्रति जिसमें कार्य शुरू और पूरा होने की तारीख दर्ज हो।
+3. अब तक ठेकेदार को किए गए कुल भुगतान का विवरण।
+4. यदि कार्य देरी से चल रहा है, तो फाइल पर दर्ज विलंब के कारणों की प्रति।
+
+आवेदन शुल्क के रूप में ₹10/- का पोस्टल ऑर्डर संलग्न है।
+
+भवदीय,
+[आपका नाम]
+[आपका पता]`,
+            dm_escalation: `सेवा में,
+जिला मजिस्ट्रेट (DM),
+गौतम बुद्ध नगर
+
+विषय: रोज़ा जलालपुर में बुनियादी ढांचा परियोजनाओं में लापरवाही के संबंध में।
+
+महोदय,
+मैं रोज़ा जलालपुर का निवासी हूँ। अवगत कराना है कि स्थानीय स्तर पर शिकायत दर्ज करने के बावजूद (शिकायत संख्या: [ID]) [सड़क/सीवर] के काम में कोई प्रगति नहीं हुई है।
+
+संलग्न साक्ष्य और RTI जवाब दिखाते हैं कि [बजट का दुरुपयोग/देरी] हो रही है। कृपया इस मामले में हस्तक्षेप करें और संबंधित अधिकारियों को समयबद्ध कार्रवाई हेतु निर्देशित करें।
+
+सादर,
+[आपका नाम]
+[पता/दिनांक]`
+        };
+
+        function nav(sectionId) {
+            document.querySelectorAll('main section').forEach(el => el.classList.add('hidden'));
+            document.getElementById(sectionId).classList.remove('hidden');
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('nav-active'));
+            const activeBtn = document.getElementById(`nav-${sectionId}`);
+            if(activeBtn) activeBtn.classList.add('nav-active');
+            
+            // Hide mobile menu on click
+            document.getElementById('mobile-menu').classList.add('hidden');
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+
+        function updateHindiTemplate() {
+            const val = document.getElementById('hindiTemplateSelect').value;
+            document.getElementById('hindiTemplateText').value = hindiTemplates[val];
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => showToast());
+        }
+
+        function copyHindiTemplate() {
+            const text = document.getElementById('hindiTemplateText').value;
+            navigator.clipboard.writeText(text).then(() => showToast());
+        }
+
+        function showToast() {
+            const t = document.getElementById('toast');
+            t.classList.remove('opacity-0');
+            setTimeout(() => t.classList.add('opacity-0'), 2000);
+        }
+
+        // Charts initialization
+        window.onload = function() {
+            updateHindiTemplate();
+            
+            const ctx = document.getElementById('hindiActionChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['चरण 1: खोज', 'चरण 2: शिकायत', 'चरण 3: RTI/प्रतीक्षा', 'चरण 4: विस्तार'],
+                    datasets: [
+                        {
+                            label: 'शुरुआत का दिन',
+                            data: [0, 5, 12, 27],
+                            backgroundColor: 'transparent',
+                            barPercentage: 0.5
+                        },
+                        {
+                            label: 'अवधि (दिनों में)',
+                            data: [5, 7, 15, 3],
+                            backgroundColor: [
+                                'rgba(59, 130, 246, 0.7)',
+                                'rgba(217, 119, 6, 0.7)',
+                                'rgba(234, 88, 12, 0.7)',
+                                'rgba(185, 28, 28, 0.7)'
+                            ],
+                            borderColor: '#374151',
+                            borderWidth: 1,
+                            barPercentage: 0.5
+                        }
+                    ]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: '30-दिवसीय नागरिक कार्रवाई समयरेखा',
+                            font: { size: 18, weight: 'bold' }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => ctx.datasetIndex === 1 ? ` अवधि: ${ctx.raw} दिन` : ''
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { stacked: true, min: 0, max: 31, title: { display: true, text: 'महीने के दिन' } },
+                        y: { stacked: true }
+                    }
+                }
+            });
+        };
+    </script>
+</body>
+</html>

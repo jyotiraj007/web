@@ -46,6 +46,10 @@ Pages addressing community infrastructure issues:
 - [RWA Planning Hindi](https://jyotiraj007.github.io/web/socialissues/rwa/rwa_hi.html)
 - [RWA Planning English](https://jyotiraj007.github.io/web/socialissues/rwa/rwa_en.html)
 
+### Infrastructure Dossier Plan
+- [Hindi](https://jyotiraj007.github.io/web/socialissues/socialissues/infrastructure/infra_dossier_plan_hi.html)
+- [English](https://jyotiraj007.github.io/web/socialissues/socialissues/infrastructure/infra_dossier_plan_en.html)
+
 ## 🚀 How to Use
 
 1. **Direct Access**: Simply click on any HTML link above to view the page in your browser

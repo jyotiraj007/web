@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roza Jalalpur Civic Action Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #fdfbf7; color: #1f2937; }
+        .chart-container { 
+            position: relative; 
+            width: 100%; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            height: 300px; 
+            max-height: 400px; 
+        } 
+        @media (min-width: 768px) { .chart-container { height: 350px; } }
+        .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); }
+        .nav-active { border-bottom: 2px solid #d97706; color: #d97706; font-weight: 600; }
+        .step-line { position: absolute; left: 1.25rem; top: 2.5rem; bottom: -1rem; width: 2px; background-color: #e5e7eb; z-index: 0; }
+        .last-step .step-line { display: none; }
+        /* Smooth fade in */
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+    <!-- Chosen Palette: Civic Sand & Amber. Background: #fdfbf7 (Warm White), Text: #1f2937 (Dark Gray), Primary: #d97706 (Amber/Orange - Alert/Construction), Secondary: #78350f (Earth Brown). -->
+    <!-- Application Structure Plan:
+        1. Header: Context setting (Roza Jalalpur).
+        2. Navigation: Logical flow from Understanding -> Planning -> Acting -> Resources.
+        3. Dashboard (Home): Executive Summary of the *Task* and Scope.
+        4. Field Guide (Tracker): Interactive cards defining *what* to look for (Roads, Water, etc.).
+        5. Timeline (Analysis): Chart.js visualization of the "30-Day Action Plan" to manage user expectations.
+        6. Escalation (Action): Interactive stepper showing the path from Grievance to Legal.
+        7. Toolkit (Resources): Copy-paste tools for Search and Templates.
+        Why: The source text is a *process guide*. The app structures this process into a workflow residents can actually follow.
+    -->
+    <!-- Visualization & Content Choices:
+        1. 30-Day Action Plan Chart: Goal -> Visualize Timeline. Method -> Chart.js Bar Chart (Gantt style logic). Interaction -> Click bar to see details. Justification -> Users need to know *how long* each step takes.
+        2. Escalation Stepper: Goal -> Clarity on Hierarchy. Method -> HTML/CSS Vertical List with JS Toggles. Interaction -> Expand step to see contacts. Justification -> Complex bureaucracies need linear simplification.
+        3. Search Query Bank: Goal -> Usability. Method -> Click-to-Copy Buttons. Justification -> Exact strings provided in source are critical for success.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <div class="h-8 w-8 bg-amber-600 rounded flex items-center justify-center text-white font-bold mr-3">RJ</div>
+                    <div>
+                        <h1 class="text-lg font-bold text-gray-900 leading-tight">Roza Jalalpur</h1>
+                        <p class="text-xs text-gray-500">Infrastructure Monitor & Civic Action Guide</p>
+                    </div>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <button onclick="nav('overview')" id="nav-overview" class="nav-btn nav-active py-2 px-1 text-sm text-gray-500 hover:text-gray-900 transition">Mission Scope</button>
+                    <button onclick="nav('tracker')" id="nav-tracker" class="nav-btn py-2 px-1 text-sm text-gray-500 hover:text-gray-900 transition">Investigator Checklist</button>
+                    <button onclick="nav('timeline')" id="nav-timeline" class="nav-btn py-2 px-1 text-sm text-gray-500 hover:text-gray-900 transition">30-Day Plan</button>
+                    <button onclick="nav('escalation')" id="nav-escalation" class="nav-btn py-2 px-1 text-sm text-gray-500 hover:text-gray-900 transition">Escalation Ladder</button>
+                    <button onclick="nav('toolkit')" id="nav-toolkit" class="nav-btn py-2 px-1 text-sm text-gray-500 hover:text-gray-900 transition">Tools & Templates</button>
+                </div>
+                <!-- Mobile Menu Button (Simplified for this demo) -->
+                <button class="md:hidden text-gray-500 hover:text-gray-900" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
+                    <span class="text-2xl">☰</span>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile Nav -->
+        <div id="mobile-menu" class="hidden md:hidden bg-gray-50 border-t border-gray-200">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <button onclick="nav('overview')" class="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-100">Mission Scope</button>
+                <button onclick="nav('tracker')" class="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-100">Investigator Checklist</button>
+                <button onclick="nav('timeline')" class="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-100">30-Day Plan</button>
+                <button onclick="nav('escalation')" class="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-100">Escalation Ladder</button>
+                <button onclick="nav('toolkit')" class="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-100">Tools & Templates</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+
+        <!-- VIEW 1: OVERVIEW -->
+        <section id="overview" class="fade-in">
+            <div class="mb-8 text-center max-w-3xl mx-auto">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Infrastructure Research Dossier</h2>
+                <p class="text-gray-600 text-lg">
+                    This dashboard maps the official plans, budgets, and escalation routes for civic development in 
+                    <span class="font-semibold text-amber-700">Roza Jalalpur — Maripat Road, Greater Noida West</span>.
+                    Use this tool to verify spending, track delays, and exercise civic oversight.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-lg card-shadow border-t-4 border-amber-500">
+                    <h3 class="text-lg font-semibold mb-2">📍 Jurisdiction</h3>
+                    <p class="text-sm text-gray-600">Greater Noida / Noida Extension & Gautam Buddh Nagar District.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg card-shadow border-t-4 border-amber-500">
+                    <h3 class="text-lg font-semibold mb-2">🎯 Objective</h3>
+                    <p class="text-sm text-gray-600">Map official plans, budget vs. actuals, timelines, and responsible agencies.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg card-shadow border-t-4 border-amber-500">
+                    <h3 class="text-lg font-semibold mb-2">⚠️ Stakes</h3>
+                    <p class="text-sm text-gray-600">Residents need accurate data to push for resolution on stalled projects and substandard work.</p>
+                </div>
+            </div>
+
+            <div class="bg-indigo-50 rounded-xl p-8 border border-indigo-100">
+                <h3 class="text-xl font-bold text-indigo-900 mb-4">Core Focus Areas</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-white p-4 rounded shadow-sm text-center">
+                        <span class="text-2xl mb-2 block">🛣️</span>
+                        <span class="font-medium text-sm">Roads & Connectivity</span>
+                    </div>
+                    <div class="bg-white p-4 rounded shadow-sm text-center">
+                        <span class="text-2xl mb-2 block">💧</span>
+                        <span class="font-medium text-sm">Water & Sewage</span>
+                    </div>
+                    <div class="bg-white p-4 rounded shadow-sm text-center">
+                        <span class="text-2xl mb-2 block">💡</span>
+                        <span class="font-medium text-sm">Street Lighting</span>
+                    </div>
+                    <div class="bg-white p-4 rounded shadow-sm text-center">
+                        <span class="text-2xl mb-2 block">🚇</span>
+                        <span class="font-medium text-sm">Metro & Transport</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 2: INVESTIGATOR CHECKLIST -->
+        <section id="tracker" class="hidden fade-in">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">Project Investigator Checklist</h2>
+                <p class="text-gray-600 mt-2">Use this framework to organize data gathered from official sources. For every project identified in Roza Jalalpur, ensure you can answer these key questions.</p>
+            </div>
+
+            <!-- Dynamic Checklist Container -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Requirements Card -->
+                <div class="bg-white rounded-lg card-shadow overflow-hidden">
+                    <div class="bg-gray-800 px-6 py-4 border-b border-gray-700 flex justify-between items-center">
+                        <h3 class="text-white font-medium">Data Requirements</h3>
+                        <span class="bg-amber-500 text-white text-xs px-2 py-1 rounded">Mandatory Fields</span>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 h-5 w-5 rounded-full border-2 border-amber-500 flex items-center justify-center text-amber-500 text-xs mt-0.5">1</div>
+                            <div class="ml-3">
+                                <h4 class="text-sm font-semibold text-gray-900">Project Identity</h4>
+                                <p class="text-sm text-gray-500">Official Project Name & Implementing Agency (e.g., GNIDA, PWD).</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 h-5 w-5 rounded-full border-2 border-amber-500 flex items-center justify-center text-amber-500 text-xs mt-0.5">2</div>
+                            <div class="ml-3">
+                                <h4 class="text-sm font-semibold text-gray-900">Financials</h4>
+                                <p class="text-sm text-gray-500">Approved Budget vs. Amount Spent to Date. (Requires RTI if not public).</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 h-5 w-5 rounded-full border-2 border-amber-500 flex items-center justify-center text-amber-500 text-xs mt-0.5">3</div>
+                            <div class="ml-3">
+                                <h4 class="text-sm font-semibold text-gray-900">Timeline</h4>
+                                <p class="text-sm text-gray-500">Start Date, Contractual Deadline, and Current Status (Ongoing/Stalled).</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 h-5 w-5 rounded-full border-2 border-amber-500 flex items-center justify-center text-amber-500 text-xs mt-0.5">4</div>
+                            <div class="ml-3">
+                                <h4 class="text-sm font-semibold text-gray-900">Source Verification</h4>
+                                <p class="text-sm text-gray-500">Direct URL to Tender/Notice or RTI Reply Reference Number.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive Project Type Focus -->
+                <div class="bg-amber-50 rounded-lg p-6 border border-amber-100">
+                    <h3 class="text-lg font-bold text-amber-900 mb-4">Sector-Specific Watchlist</h3>
+                    <div class="space-y-3">
+                        <details class="group bg-white rounded-md shadow-sm border border-amber-100">
+                            <summary class="flex justify-between items-center font-medium cursor-pointer list-none p-4 text-gray-800 hover:bg-amber-50 transition">
+                                <span>🛣️ Road Infrastructure</span>
+                                <span class="transition group-open:rotate-180">▼</span>
+                            </summary>
+                            <div class="text-gray-600 p-4 border-t border-gray-100 text-sm">
+                                <strong>Look for:</strong> Resurfacing contracts, widening projects on Maripat Road, drainage integration along curbs. <br>
+                                <strong>Agency:</strong> Usually PWD or GNIDA Engineering Dept.
+                            </div>
+                        </details>
+                        
+                        <details class="group bg-white rounded-md shadow-sm border border-amber-100">
+                            <summary class="flex justify-between items-center font-medium cursor-pointer list-none p-4 text-gray-800 hover:bg-amber-50 transition">
+                                <span>🚍 Public Transport & Metro</span>
+                                <span class="transition group-open:rotate-180">▼</span>
+                            </summary>
+                            <div class="text-gray-600 p-4 border-t border-gray-100 text-sm">
+                                <strong>Look for:</strong> Bus shelter tenders, NMRC metro extension DPRs (Detailed Project Reports) affecting Greater Noida West.
+                            </div>
+                        </details>
+
+                        <details class="group bg-white rounded-md shadow-sm border border-amber-100">
+                            <summary class="flex justify-between items-center font-medium cursor-pointer list-none p-4 text-gray-800 hover:bg-amber-50 transition">
+                                <span>🗑️ Civic Amenities (Sewage/Lights)</span>
+                                <span class="transition group-open:rotate-180">▼</span>
+                            </summary>
+                            <div class="text-gray-600 p-4 border-t border-gray-100 text-sm">
+                                <strong>Look for:</strong> STP (Sewage Treatment Plant) capacity upgrades, LED street light maintenance contracts for Roza Jalalpur sectors.
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 3: 30-DAY PLAN (CHART) -->
+        <section id="timeline" class="hidden fade-in">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">30-Day Citizen Action Plan</h2>
+                <p class="text-gray-600 mt-2">A structured timeline to move from information gathering to effective escalation. Don't rush—follow the process to build a legally sound case.</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg card-shadow mb-6">
+                <div class="chart-container">
+                    <canvas id="actionPlanChart"></canvas>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                <div class="p-4 bg-blue-50 rounded border-l-4 border-blue-500">
+                    <h4 class="font-bold text-blue-900">Days 1-7</h4>
+                    <p class="text-sm text-blue-800">Discovery & Initial Grievance Filing</p>
+                </div>
+                <div class="p-4 bg-yellow-50 rounded border-l-4 border-yellow-500">
+                    <h4 class="font-bold text-yellow-900">Days 8-22</h4>
+                    <p class="text-sm text-yellow-800">RTI Verification & Waiting Period</p>
+                </div>
+                <div class="p-4 bg-orange-50 rounded border-l-4 border-orange-500">
+                    <h4 class="font-bold text-orange-900">Days 23-27</h4>
+                    <p class="text-sm text-orange-800">Review & First Appeal Drafting</p>
+                </div>
+                <div class="p-4 bg-red-50 rounded border-l-4 border-red-500">
+                    <h4 class="font-bold text-red-900">Days 28-30</h4>
+                    <p class="text-sm text-red-800">Final Escalation (DM/Lokayukta)</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 4: ESCALATION LADDER -->
+        <section id="escalation" class="hidden fade-in">
+             <div class="mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">Escalation & Remedies Framework</h2>
+                <p class="text-gray-600 mt-2">If grievances are unresolved within prescribed timelines, follow this strict ladder. Document every complaint ID.</p>
+            </div>
+
+            <div class="max-w-4xl mx-auto bg-white rounded-xl card-shadow p-8 relative">
+                
+                <!-- Step 1 -->
+                <div class="relative pl-12 pb-12">
+                    <div class="step-line"></div>
+                    <div class="absolute left-0 top-0 h-10 w-10 bg-indigo-100 rounded-full border-2 border-indigo-600 flex items-center justify-center text-indigo-700 font-bold z-10">1</div>
+                    <h3 class="text-xl font-bold text-gray-900">Level 1: Official Grievance</h3>
+                    <p class="text-gray-600 mb-2">File a formal complaint through official portals. This generates a ticket number essential for future steps.</p>
+                    <div class="bg-gray-50 p-4 rounded border border-gray-200">
+                        <strong class="text-sm block mb-1">Portals:</strong>
+                        <ul class="list-disc list-inside text-sm text-gray-700">
+                            <li>GNIDA Mitra App / Website</li>
+                            <li>Jansunwai (UP Govt Portal) - <span class="italic">jansunwai.up.nic.in</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="relative pl-12 pb-12">
+                    <div class="step-line"></div>
+                    <div class="absolute left-0 top-0 h-10 w-10 bg-indigo-100 rounded-full border-2 border-indigo-600 flex items-center justify-center text-indigo-700 font-bold z-10">2</div>
+                    <h3 class="text-xl font-bold text-gray-900">Level 2: Right to Information (RTI)</h3>
+                    <p class="text-gray-600 mb-2">If status is unclear or work is stalled, file an RTI to demand budget and deadline details.</p>
+                    <div class="bg-gray-50 p-4 rounded border border-gray-200">
+                        <strong class="text-sm block mb-1">Target Agencies:</strong>
+                        <div class="flex flex-wrap gap-2 text-xs">
+                            <span class="bg-white border px-2 py-1 rounded">PIO, GNIDA</span>
+                            <span class="bg-white border px-2 py-1 rounded">PIO, UP PWD</span>
+                            <span class="bg-white border px-2 py-1 rounded">District Collectorate</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="relative pl-12 pb-12">
+                    <div class="step-line"></div>
+                    <div class="absolute left-0 top-0 h-10 w-10 bg-indigo-100 rounded-full border-2 border-indigo-600 flex items-center justify-center text-indigo-700 font-bold z-10">3</div>
+                    <h3 class="text-xl font-bold text-gray-900">Level 3: District Magistrate / Collector</h3>
+                    <p class="text-gray-600 mb-2">Escalate with evidence (Photos + Level 1 Complaint ID + Level 2 RTI Reply).</p>
+                    <button onclick="nav('toolkit')" class="text-amber-600 text-sm font-semibold hover:underline">View DM Contact Queries &rarr;</button>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="relative pl-12 last-step">
+                    <div class="absolute left-0 top-0 h-10 w-10 bg-red-100 rounded-full border-2 border-red-600 flex items-center justify-center text-red-700 font-bold z-10">4</div>
+                    <h3 class="text-xl font-bold text-gray-900">Level 4: Lokayukta / Vigilance</h3>
+                    <p class="text-gray-600 mb-2">Final administrative step for corruption or gross negligence.</p>
+                    <div class="p-3 bg-red-50 text-red-800 text-sm rounded">
+                        <strong>Note:</strong> Requires solid documentary evidence gathered in steps 1-3.
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- VIEW 5: TOOLKIT -->
+        <section id="toolkit" class="hidden fade-in">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">Tools & Templates</h2>
+                <p class="text-gray-600 mt-2">Copy-paste resources to speed up your research and filing process.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                <!-- Search Queries -->
+                <div class="bg-white p-6 rounded-lg card-shadow">
+                    <h3 class="text-lg font-bold mb-4 flex items-center">
+                        <span class="bg-amber-100 text-amber-800 p-1 rounded mr-2">🔍</span> Priority Search Queries
+                    </h3>
+                    <p class="text-sm text-gray-500 mb-4">Use these exact terms on Google or official portals.</p>
+                    
+                    <div class="space-y-3">
+                        <div class="search-item flex justify-between items-center bg-gray-50 p-3 rounded border border-gray-200">
+                            <code class="text-sm text-indigo-700 font-mono">“GNIDA Roza Jalalpur public notice”</code>
+                            <button onclick="copyToClipboard('GNIDA Roza Jalalpur public notice')" class="text-xs bg-white border border-gray-300 px-2 py-1 rounded hover:bg-gray-100">Copy</button>
+                        </div>
+                        <div class="search-item flex justify-between items-center bg-gray-50 p-3 rounded border border-gray-200">
+                            <code class="text-sm text-indigo-700 font-mono">“Roza Jalalpur Maripat Road project”</code>
+                            <button onclick="copyToClipboard('Roza Jalalpur Maripat Road infrastructure project')" class="text-xs bg-white border border-gray-300 px-2 py-1 rounded hover:bg-gray-100">Copy</button>
+                        </div>
+                        <div class="search-item flex justify-between items-center bg-gray-50 p-3 rounded border border-gray-200">
+                            <code class="text-sm text-indigo-700 font-mono">“Greater Noida West infrastructure budget”</code>
+                            <button onclick="copyToClipboard('Greater Noida West infrastructure budget GNIDA')" class="text-xs bg-white border border-gray-300 px-2 py-1 rounded hover:bg-gray-100">Copy</button>
+                        </div>
+                        <div class="search-item flex justify-between items-center bg-gray-50 p-3 rounded border border-gray-200">
+                            <code class="text-sm text-indigo-700 font-mono">“UP PWD road projects Gautam Buddh Nagar”</code>
+                            <button onclick="copyToClipboard('UP PWD road projects Gautam Buddh Nagar')" class="text-xs bg-white border border-gray-300 px-2 py-1 rounded hover:bg-gray-100">Copy</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Template Selector -->
+                <div class="bg-white p-6 rounded-lg card-shadow">
+                    <h3 class="text-lg font-bold mb-4 flex items-center">
+                        <span class="bg-amber-100 text-amber-800 p-1 rounded mr-2">📄</span> Draft Templates
+                    </h3>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Select Template Type</label>
+                        <select id="templateSelect" onchange="updateTemplate()" class="w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-amber-500 focus:border-amber-500">
+                            <option value="grievance">Grievance Complaint</option>
+                            <option value="rti">RTI Application (Budget/Status)</option>
+                            <option value="followup">Follow-up / Escalation Email</option>
+                        </select>
+                    </div>
+
+                    <div class="relative">
+                        <textarea id="templateText" class="w-full h-48 p-3 text-sm font-mono bg-gray-50 border border-gray-300 rounded text-gray-700" readonly></textarea>
+                        <button onclick="copyTemplate()" class="absolute top-2 right-2 bg-white border border-gray-300 px-3 py-1 text-xs rounded shadow-sm hover:bg-amber-50 text-amber-700 font-medium">Copy Text</button>
+                    </div>
+                </div>
+
+            </div>
+
+             <!-- External Links -->
+             <div class="mt-8 bg-indigo-50 p-6 rounded-lg border border-indigo-100">
+                <h3 class="font-bold text-indigo-900 mb-2">Primary Official Portals</h3>
+                <div class="flex flex-wrap gap-4">
+                    <a href="https://gnida.up.gov.in" target="_blank" class="text-indigo-600 hover:underline text-sm">GNIDA Official Website ↗</a>
+                    <a href="https://gbnagar.nic.in" target="_blank" class="text-indigo-600 hover:underline text-sm">Gautam Buddh Nagar District Portal ↗</a>
+                    <a href="http://jansunwai.up.nic.in" target="_blank" class="text-indigo-600 hover:underline text-sm">Jansunwai (Grievance) ↗</a>
+                    <a href="https://uppwd.gov.in" target="_blank" class="text-indigo-600 hover:underline text-sm">UP PWD ↗</a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-gray-400 py-6">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-xs mt-2">Data Confidence Warning: This tool provides the <strong>methodology</strong>. Residents must verify live data from official sources.</p>
+        </div>
+    </footer>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-gray-900 text-white px-4 py-2 rounded shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none">
+        Copied to clipboard!
+    </div>
+
+    <script>
+        // State Management
+        const templates = {
+            grievance: `Subject: Urgent Attention Required: [Project Name/Issue] in Roza Jalalpur
+
+To The Competent Authority,
+[GNIDA / PWD / District Admin]
+
+I am writing to bring to your attention the condition of [Infrastructure Issue] at [Exact Location, Roza Jalalpur, Maripat Road].
+
+Despite [previous timeline/promises], the work is [Stalled/Substandard/Not Started]. This is causing severe inconvenience regarding [Traffic/Safety/Health] for residents.
+
+I request you to:
+1. Inspect the site immediately.
+2. Provide the expected completion date.
+3. Share the contact details of the contractor/engineer in charge.
+
+Please treat this as a formal grievance.
+
+Sincerely,
+[Name]
+[Address]
+[Phone]`,
+            rti: `To The Public Information Officer (PIO),
+[Department Name: GNIDA / PWD]
+[Address]
+
+Subject: Application under Right to Information Act, 2005.
+
+Sir/Madam,
+
+Please provide the following information regarding the infrastructure project: [Project Name] located at [Roza Jalalpur, Maripat Road]:
+
+1. Copy of the administrative approval and total sanctioned budget.
+2. Name of the agency/contractor to whom the work was awarded.
+3. Copy of the work order including start date and scheduled completion date.
+4. Total amount paid to the contractor till date.
+5. Reasons recorded on file for delay (if any).
+
+I am attaching the application fee of Rs. 10/- via [IPO/Cash/Stamp].
+
+Sincerely,
+[Name]
+[Address]
+[Date]`,
+            followup: `Subject: Reminder: Pending Action on Complaint ID [XXXXX]
+
+Respected Sir/Madam,
+
+This is to remind you that my grievance filed on [Date] regarding [Issue] in Roza Jalalpur (ID: [Complaint ID]) remains unresolved.
+
+The prescribed timeline for resolution has passed. 
+
+If no action is taken within 3 days, I will be compelled to escalate this matter to the [District Magistrate/Lokayukta] citing administrative negligence.
+
+Regards,
+[Name]
+[Phone]`
+        };
+
+        // Navigation Logic
+        function nav(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('main section').forEach(el => el.classList.add('hidden'));
+            // Show target section
+            document.getElementById(sectionId).classList.remove('hidden');
+            
+            // Update Nav Buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('nav-active', 'text-gray-900', 'font-semibold'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.add('text-gray-500'));
+            
+            const activeBtn = document.getElementById(`nav-${sectionId}`);
+            if(activeBtn) {
+                activeBtn.classList.add('nav-active', 'text-gray-900', 'font-semibold');
+                activeBtn.classList.remove('text-gray-500');
+            }
+        }
+
+        // Template Logic
+        function updateTemplate() {
+            const type = document.getElementById('templateSelect').value;
+            document.getElementById('templateText').value = templates[type];
+        }
+
+        // Copy Logic
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => showToast());
+        }
+
+        function copyTemplate() {
+            const text = document.getElementById('templateText').value;
+            navigator.clipboard.writeText(text).then(() => showToast());
+        }
+
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.remove('opacity-0');
+            setTimeout(() => toast.classList.add('opacity-0'), 2000);
+        }
+
+        // Initialize Charts
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set initial template
+            updateTemplate();
+
+            // Chart.js Configuration
+            const ctx = document.getElementById('actionPlanChart').getContext('2d');
+            
+            // Data for Gantt-style representation
+            // We use a stacked bar chart with transparent placeholders to simulate a Gantt chart
+            const actionPlanChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Phase 1: Discovery', 'Phase 2: Grievance', 'Phase 3: RTI/Wait', 'Phase 4: Escalation'],
+                    datasets: [
+                        {
+                            label: 'Start Day Offset', // Transparent spacer
+                            data: [0, 5, 12, 27],
+                            backgroundColor: 'rgba(0,0,0,0)', 
+                            borderWidth: 0,
+                            barPercentage: 0.6
+                        },
+                        {
+                            label: 'Duration (Days)',
+                            data: [5, 7, 15, 3], // Duration of each phase
+                            backgroundColor: [
+                                'rgba(59, 130, 246, 0.8)', // Blue
+                                'rgba(234, 179, 8, 0.8)',  // Yellow
+                                'rgba(249, 115, 22, 0.8)', // Orange
+                                'rgba(220, 38, 38, 0.8)'   // Red
+                            ],
+                            borderColor: [
+                                'rgba(59, 130, 246, 1)',
+                                'rgba(234, 179, 8, 1)',
+                                'rgba(249, 115, 22, 1)',
+                                'rgba(220, 38, 38, 1)'
+                            ],
+                            borderWidth: 1,
+                            borderRadius: 4,
+                            barPercentage: 0.6
+                        }
+                    ]
+                },
+                options: {
+                    indexAxis: 'y', // Horizontal Bar
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    if(context.datasetIndex === 0) return ''; // Hide spacer tooltip
+                                    return ` Duration: ${context.raw} Days`;
+                                }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Recommended 30-Day Action Timeline',
+                            font: { size: 16 }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true,
+                            title: { display: true, text: 'Day of Month' },
+                            min: 0,
+                            max: 31
+                        },
+                        y: {
+                            stacked: true
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
