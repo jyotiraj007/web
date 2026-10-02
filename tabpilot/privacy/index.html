@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TabPilot privacy policy</title>
+<meta name="description" content="Privacy policy for the TabPilot browser extension.">
+<style>
+:root{color-scheme:light dark;--bg:#fff;--fg:#1c1b29;--muted:#6b6a7a;--accent:#5b3fe0;--line:#e2e0ec;--code:#f3f2f8}
+@media (prefers-color-scheme:dark){:root{--bg:#16151f;--fg:#eceaf6;--muted:#9b99ad;--accent:#a592ff;--line:#33314a;--code:#232231}}
+body{margin:0 auto;max-width:720px;padding:32px 20px 64px;background:var(--bg);color:var(--fg);font:16px/1.65 -apple-system,system-ui,"Segoe UI",sans-serif}
+h1{font-size:30px;margin:0 0 6px} h2{font-size:20px;margin:34px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--line)}
+p,li{margin:.6em 0} ul{padding-left:1.3em} a{color:var(--accent)}
+code{background:var(--code);border:1px solid var(--line);border-radius:4px;padding:0 5px;font-size:.92em}
+em{color:var(--muted)}
+</style>
+</head>
+<body>
+<h1>TabPilot privacy policy</h1>
+<p><em>Last updated: 2026-10-02</em></p>
+<p>TabPilot is an unofficial, open-source browser extension and local helper that lets an AI agent you choose (Cursor's agent, or the extension's own side-panel chat) see and control your browser. It is not affiliated with or endorsed by Anysphere (Cursor), Anthropic, Google or OpenAI.</p>
+<h2>What TabPilot does not do</h2>
+<ul>
+<li>It has no servers and no analytics. The developers receive no data from you: no page content, no browsing history, no keys, no usage statistics.</li>
+<li>It does not sell or share data, and it does not load remote code.</li>
+</ul>
+<h2>What it accesses and why</h2>
+<p>When an agent uses the browser, TabPilot reads and acts on the pages <strong>in its own tab group only</strong> (page text and structure, screenshots, console and network activity of those tabs, and input events it sends). This is the product's single purpose. It does this only after you open its side panel on a tab or when your agent calls it, and you can stop it at any time with the Stop button.</p>
+<h2>Where that data goes</h2>
+<ul>
+<li><strong>Cursor's agent (MCP):</strong> results of tool calls (for example a screenshot or page text) are returned over a local connection (browser → native helper → MCP server on your computer) to Cursor, which processes them under Cursor's own terms and privacy policy.</li>
+<li><strong>Side-panel chat with the Cursor CLI provider:</strong> your prompt and tool results are handled by the <code>cursor-agent</code> program on your computer, under Cursor's terms.</li>
+<li><strong>Side-panel chat with an API-key provider (Anthropic or an OpenAI-compatible endpoint you configure):</strong> your prompt and the tool results are sent from your browser directly to that provider using the key you supplied, under that provider's terms.</li>
+</ul>
+<p>TabPilot never sends data anywhere else.</p>
+<h2>What is stored on your computer</h2>
+<ul>
+<li>Your settings, site permissions (allow/block lists), saved shortcuts, scheduled tasks and, if you choose an API-key provider, your API key are stored in <code>chrome.storage.local</code> in your browser profile. Session approvals are kept in <code>chrome.storage.session</code> and cleared when the browser closes.</li>
+<li>The local helper keeps small files in <code>~/.tabpilot</code> (Windows: <code>%USERPROFILE%\.tabpilot</code>): a launcher, a config file, and per-connection descriptors, readable only by your user account.</li>
+<li>Removing the extension deletes the browser-side data; <code>npx tabpilot uninstall</code> removes the local helper files.</li>
+</ul>
+<h2>Safety controls you have</h2>
+<p>Per-site permissions (allow once, always, block), an "Ask before acting" mode, a visible indicator on controlled tabs, and a Stop button. TabPilot refuses to type into password and payment fields and will not proceed past CAPTCHAs.</p>
+<h2>Children</h2>
+<p>TabPilot is not directed at children.</p>
+<h2>Changes and contact</h2>
+<p>Changes to this policy are published on this page with a new date. Questions or requests: <a href="mailto:jyotirajsingh3@gmail.com.">jyotirajsingh3@gmail.com.</a></p>
+</body>
+</html>
