@@ -12,7 +12,7 @@
 - Per-site permissions (allow once, always allow, block) and an "Ask before acting" mode that asks before any submit, purchase or delete.
 - A visible bar on controlled tabs with a **Stop** button that cancels everything at once.
 - It never types into password or payment fields and never solves CAPTCHAs. Page content is treated as data, never as instructions.
-- No servers, no analytics, no tracking. See the [privacy policy](privacy/).
+- No servers, no analytics, no tracking. See the [privacy policy](https://jyotiraj007.github.io/web/tabpilot/privacy/).
 
 | | |
 |---|---|
@@ -35,5 +35,5 @@
 
 ## Pages
 
-- [Privacy policy](privacy/)
+- [Privacy policy](https://jyotiraj007.github.io/web/tabpilot/privacy/)
 - [Screenshots](assets/)
